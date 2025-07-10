@@ -2,9 +2,9 @@
 
 ## Notação
 
-Esta gramática está escrita em BNF (Backus-Naur Form) estendida:
+Esta gramática está escrita em uma notação simplificada e intuitiva:
 
-- `::=` - Definição de regra
+- `=` - Definição de regra (substitui ::=)
 - `|` - Alternativa (ou)
 - `[ ]` - Opcional
 - `{ }` - Repetição zero ou mais vezes
@@ -18,31 +18,31 @@ Esta gramática está escrita em BNF (Backus-Naur Form) estendida:
 ### Programa Principal
 
 ```bnf
-programa ::= "RAINBOW" "." { declaracao }
+programa = "RAINBOW" "." { declaracao }
 
-declaracao ::= declaracao_variavel
-             | atribuicao
-             | condicional
-             | laco_para
-             | laco_enquanto
-             | chamada_funcao
+declaracao = declaracao_variavel
+           | atribuicao
+           | condicional
+           | laco_para
+           | laco_enquanto
+           | chamada_funcao
 ```
 
 ### Declarações de Variáveis
 
 ```bnf
-declaracao_variavel ::= tipo_dado VARIAVEL "."
+declaracao_variavel = tipo_dado VARIAVEL "."
 
-tipo_dado ::= "cor_numero"
-            | "cor_texto"
-            | "cor_logico"
-            | "cor_lista"
+tipo_dado = "cor_numero"
+          | "cor_texto"
+          | "cor_logico"
+          | "cor_lista"
 ```
 
 ### Atribuição
 
 ```bnf
-atribuicao ::= VARIAVEL "recebe" expressao "."
+atribuicao = VARIAVEL "recebe" expressao "."
 ```
 
 ### Estruturas de Controle
@@ -50,82 +50,82 @@ atribuicao ::= VARIAVEL "recebe" expressao "."
 #### Condicional
 
 ```bnf
-condicional ::= "se" "(" expressao ")" bloco
-                { "senaose" "(" expressao ")" bloco }
-                [ "senao" bloco ]
+condicional = "se" "(" expressao ")" bloco
+              { "senaose" "(" expressao ")" bloco }
+              [ "senao" bloco ]
 ```
 
 #### Laço Para
 
 ```bnf
-laco_para ::= "para" VARIAVEL "de" expressao "ate" expressao "passo" expressao bloco
+laco_para = "para" VARIAVEL "de" expressao "ate" expressao "passo" expressao bloco
 ```
 
 #### Laço Enquanto
 
 ```bnf
-laco_enquanto ::= "enquanto" "(" expressao ")" bloco
+laco_enquanto = "enquanto" "(" expressao ")" bloco
 ```
 
 #### Bloco
 
 ```bnf
-bloco ::= "{" { declaracao } "}"
+bloco = "{" { declaracao } "}"
 ```
 
 ### Expressões
 
 ```bnf
-expressao ::= expressao_ou
+expressao = expressao_ou
 
-expressao_ou ::= expressao_e { "OU" expressao_e }
+expressao_ou = expressao_e { "OU" expressao_e }
 
-expressao_e ::= expressao_igualdade { "E" expressao_igualdade }
+expressao_e = expressao_igualdade { "E" expressao_igualdade }
 
-expressao_igualdade ::= expressao_comparacao { ( "igual" | "diferente" ) expressao_comparacao }
+expressao_igualdade = expressao_comparacao { ( "igual" | "diferente" ) expressao_comparacao }
 
-expressao_comparacao ::= expressao_adicao { ( ">" | "<" | ">=" | "<=" ) expressao_adicao }
+expressao_comparacao = expressao_adicao { ( ">" | "<" | ">=" | "<=" ) expressao_adicao }
 
-expressao_adicao ::= expressao_multiplicacao { ( "+" | "-" ) expressao_multiplicacao }
+expressao_adicao = expressao_multiplicacao { ( "+" | "-" ) expressao_multiplicacao }
 
-expressao_multiplicacao ::= expressao_unaria { ( "*" | "/" | "%" ) expressao_unaria }
+expressao_multiplicacao = expressao_unaria { ( "*" | "/" | "%" ) expressao_unaria }
 
-expressao_unaria ::= ( "NAO" | "-" ) expressao_unaria
-                   | expressao_primaria
+expressao_unaria = ( "NAO" | "-" ) expressao_unaria
+                 | expressao_primaria
 
-expressao_primaria ::= NUMERO
-                     | TEXTO
-                     | "Verdadeiro"
-                     | "Falso"
-                     | VARIAVEL
-                     | chamada_funcao_expressao
-                     | "(" expressao ")"
+expressao_primaria = NUMERO
+                   | TEXTO
+                   | "Verdadeiro"
+                   | "Falso"
+                   | VARIAVEL
+                   | chamada_funcao_expressao
+                   | "(" expressao ")"
 ```
 
 ### Funções
 
 ```bnf
-chamada_funcao ::= ( "mostrar" | "ler" ) "(" [ expressao ] ")" "."
+chamada_funcao = ( "mostrar" | "ler" ) "(" [ expressao ] ")" "."
 
-chamada_funcao_expressao ::= "ler" "(" [ expressao ] ")"
+chamada_funcao_expressao = "ler" "(" [ expressao ] ")"
 ```
 
 ### Tokens Terminais
 
 ```bnf
-VARIAVEL ::= "#" LETRA { LETRA | DIGITO | "_" }
+VARIAVEL = "#" LETRA { LETRA | DIGITO | "_" }
 
-NUMERO ::= [ "-" ] DIGITO { DIGITO } [ "." DIGITO { DIGITO } ]
+NUMERO = [ "-" ] DIGITO { DIGITO } [ "." DIGITO { DIGITO } ]
 
-TEXTO ::= "\"" { CARACTERE | ESCAPE } "\""
+TEXTO = "\"" { CARACTERE | ESCAPE } "\""
 
-ESCAPE ::= "\\" ( "n" | "t" | "r" | "\\" | "\"" | "'" )
+ESCAPE = "\\" ( "n" | "t" | "r" | "\\" | "\"" | "'" )
 
-LETRA ::= "a" | "b" | ... | "z" | "A" | "B" | ... | "Z"
+LETRA = "a" | "b" | ... | "z" | "A" | "B" | ... | "Z"
 
-DIGITO ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+DIGITO = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 
-CARACTERE ::= qualquer_caractere_unicode_exceto_aspas_e_barra
+CARACTERE = qualquer_caractere_unicode_exceto_aspas_e_barra
 ```
 
 ## Precedência de Operadores
@@ -279,22 +279,22 @@ O parser implementa recuperação de erros através de:
 
 1. **Funções Definidas pelo Usuário**:
    ```bnf
-   definicao_funcao ::= "funcao" IDENTIFICADOR "(" [ parametros ] ")" bloco
+   definicao_funcao = "funcao" IDENTIFICADOR "(" [ parametros ] ")" bloco
    ```
 
 2. **Estruturas de Dados**:
    ```bnf
-   acesso_lista ::= VARIAVEL "[" expressao "]"
+   acesso_lista = VARIAVEL "[" expressao "]"
    ```
 
 3. **Comentários de Bloco**:
    ```bnf
-   comentario_bloco ::= "/*" { qualquer_caractere } "*/"
+   comentario_bloco = "/*" { qualquer_caractere } "*/"
    ```
 
 4. **Tratamento de Exceções**:
    ```bnf
-   try_catch ::= "tente" bloco "capture" "(" VARIAVEL ")" bloco
+   try_catch = "tente" bloco "capture" "(" VARIAVEL ")" bloco
    ```
 
 ---
