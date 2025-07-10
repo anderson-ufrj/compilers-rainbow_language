@@ -45,10 +45,10 @@ RAINBOW.
 | Palavra | Descrição | Uso |
 |---------|-----------|-----|
 | `RAINBOW` | Marca o início do programa | `RAINBOW.` |
-| `cor_numero` | Tipo numérico | `cor_numero #idade.` |
-| `cor_texto` | Tipo texto/string | `cor_texto #nome.` |
-| `cor_logico` | Tipo booleano | `cor_logico #ativo.` |
-| `cor_lista` | Tipo lista/array | `cor_lista #numeros.` |
+| `numero` | Tipo numérico | `numero #idade.` |
+| `texto` | Tipo texto/string | `texto #nome.` |
+| `logico` | Tipo booleano | `logico #ativo.` |
+| `lista` | Tipo lista/array | `lista #numeros.` |
 | `recebe` | Operador de atribuição | `#x recebe 10.` |
 | `se` | Condicional if | `se (#x > 0) { }` |
 | `senao` | Condicional else | `senao { }` |
@@ -125,43 +125,43 @@ Strings são delimitadas por aspas duplas:
 
 ## Tipos de Dados
 
-### cor_numero
+### numero
 Representa valores numéricos (inteiros e decimais):
 ```rainbow
-cor_numero #idade.
+numero #idade.
 #idade recebe 25.
 
-cor_numero #preco.
+numero #preco.
 #preco recebe 19.99.
 ```
 
-### cor_texto
+### texto
 Representa strings de texto:
 ```rainbow
-cor_texto #nome.
+texto #nome.
 #nome recebe "Maria Silva".
 
-cor_texto #endereco.
+texto #endereco.
 #endereco recebe "Rua das Flores, 123".
 ```
 
-### cor_logico
+### logico
 Representa valores booleanos (Verdadeiro/Falso):
 ```rainbow
-cor_logico #ativo.
+logico #ativo.
 #ativo recebe Verdadeiro.
 
-cor_logico #encontrado.
+logico #encontrado.
 #encontrado recebe Falso.
 ```
 
-### cor_lista
+### lista
 Representa listas/arrays de elementos:
 ```rainbow
-cor_lista #numeros.
+lista #numeros.
 #numeros recebe [1, 2, 3, 4, 5].
 
-cor_lista #nomes.
+lista #nomes.
 #nomes recebe ["Ana", "Bruno", "Carlos"].
 ```
 
@@ -170,9 +170,9 @@ cor_lista #nomes.
 ### Declaração
 Variáveis podem ser declaradas com tipo explícito:
 ```rainbow
-cor_numero #idade.
-cor_texto #nome.
-cor_logico #casado.
+numero #idade.
+texto #nome.
+logico #casado.
 ```
 
 ### Atribuição
@@ -187,7 +187,7 @@ Use o operador `recebe` para atribuir valores:
 Você pode declarar e atribuir em momentos diferentes ou usar diretamente:
 ```rainbow
 // Declaração explícita
-cor_numero #salario.
+numero #salario.
 #salario recebe 5000.50.
 
 // Uso direto (tipo inferido)
@@ -391,8 +391,8 @@ Use `//` para comentários de linha:
 RAINBOW.
 
 // 1. Declarações de variáveis
-cor_numero #idade.
-cor_texto #nome.
+numero #idade.
+texto #nome.
 
 // 2. Inicializações
 #idade recebe 0.
@@ -534,8 +534,8 @@ enquanto (#continuar igual Verdadeiro) {
 RAINBOW.
 
 // Declarações
-cor_numero #variavel1.
-cor_texto #variavel2.
+numero #variavel1.
+texto #variavel2.
 
 // Entrada
 #variavel1 recebe ler("Prompt: ").

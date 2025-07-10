@@ -104,10 +104,10 @@ class AnalisadorLexico:
         # Palavras reservadas da linguagem
         self.palavras_reservadas = {
             'RAINBOW': TokenType.RAINBOW,
-            'cor_numero': TokenType.TIPO_NUMERO,
-            'cor_texto': TokenType.TIPO_TEXTO,
-            'cor_logico': TokenType.TIPO_LOGICO,
-            'cor_lista': TokenType.TIPO_LISTA,
+            'numero': TokenType.TIPO_NUMERO,
+            'texto': TokenType.TIPO_TEXTO,
+            'logico': TokenType.TIPO_LOGICO,
+            'lista': TokenType.TIPO_LISTA,
             'igual': TokenType.OPER_IGUAL,
             'diferente': TokenType.OPER_DIFERENTE,
             'recebe': TokenType.OPER_ATRIBUICAO,

@@ -33,10 +33,10 @@ declaracao = declaracao_variavel
 ```bnf
 declaracao_variavel = tipo_dado VARIAVEL "."
 
-tipo_dado = "cor_numero"
-          | "cor_texto"
-          | "cor_logico"
-          | "cor_lista"
+tipo_dado = "numero"
+          | "texto"
+          | "logico"
+          | "lista"
 ```
 
 ### Atribuição

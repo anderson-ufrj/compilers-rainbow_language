@@ -473,7 +473,7 @@ enquanto (#tentativas < #max_tentativas E #logado igual Falso) {
 RAINBOW.
 
 // Trabalhando com listas
-cor_lista #numeros.
+lista #numeros.
 #numeros recebe [10, 25, 7, 33, 18, 42, 1, 95].
 
 mostrar("Lista original: " + #numeros).
@@ -509,7 +509,7 @@ mostrar("Média: " + #media).
 RAINBOW.
 
 // Gerenciador de lista de nomes
-cor_lista #nomes.
+lista #nomes.
 #nomes recebe ["Ana", "Bruno", "Carlos", "Diana", "Eduardo"].
 
 mostrar("=== LISTA DE NOMES ===").
