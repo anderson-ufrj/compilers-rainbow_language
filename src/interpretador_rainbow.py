@@ -205,15 +205,33 @@ class InterpretadorRainbow:
         
         # Executar bloco apropriado
         if resultado:
-            for linha_bloco in bloco_se:
-                if linha_bloco.strip() and not linha_bloco.strip() == '}':
-                    self.executar_linha(linha_bloco.strip(), linhas, 0)
+            self._executar_bloco(bloco_se)
         else:
-            for linha_bloco in bloco_senao:
-                if linha_bloco.strip() and not linha_bloco.strip() == '}':
-                    self.executar_linha(linha_bloco.strip(), linhas, 0)
+            self._executar_bloco(bloco_senao)
         
         return i
+    
+    def _executar_bloco(self, bloco_linhas):
+        """Executa um bloco de linhas de código"""
+        i = 0
+        while i < len(bloco_linhas):
+            linha = bloco_linhas[i].strip()
+            
+            # Pular linhas vazias e fechamentos de bloco
+            if not linha or linha == '}':
+                i += 1
+                continue
+                
+            try:
+                novo_i = self.executar_linha(linha, bloco_linhas, i)
+                # Se executar_linha retornou um novo índice (estruturas de controle),
+                # usar esse índice. Caso contrário, incrementar normalmente.
+                if novo_i != i + 1:
+                    i = novo_i
+                else:
+                    i += 1
+            except Exception as e:
+                raise Exception(f"Erro na execução do bloco, linha {i+1}: {str(e)}")
     
     def executar_enquanto(self, linha, linhas, indice):
         """Executa laço enquanto"""
@@ -247,9 +265,7 @@ class InterpretadorRainbow:
         iteracoes = 0
         
         while self.avaliar_expressao(condicao) and iteracoes < max_iteracoes:
-            for linha_bloco in bloco:
-                if linha_bloco.strip() and not linha_bloco.strip() == '}':
-                    self.executar_linha(linha_bloco.strip(), linhas, 0)
+            self._executar_bloco(bloco)
             iteracoes += 1
             
         if iteracoes >= max_iteracoes:
@@ -291,11 +307,7 @@ class InterpretadorRainbow:
         valor_atual = inicio
         while (passo > 0 and valor_atual <= fim) or (passo < 0 and valor_atual >= fim):
             self.variaveis[var_nome] = valor_atual
-            
-            for linha_bloco in bloco:
-                if linha_bloco.strip() and not linha_bloco.strip() == '}':
-                    self.executar_linha(linha_bloco.strip(), linhas, 0)
-                    
+            self._executar_bloco(bloco)
             valor_atual += passo
         
         return i
@@ -435,11 +447,21 @@ class InterpretadorRainbow:
     def _tem_operador_fora_aspas(self, expressao):
         """Verifica se há operadores fora das aspas"""
         em_string = False
-        for i, char in enumerate(expressao):
-            if char == '"':
+        i = 0
+        while i < len(expressao):
+            if expressao[i] == '"':
                 em_string = not em_string
-            elif not em_string and char in ['+', '-', '*', '/', '%']:
-                return True
+            elif not em_string:
+                # Verificar operadores relacionais (>=, <=, ==, !=)
+                if i < len(expressao) - 1:
+                    dois_chars = expressao[i:i+2]
+                    if dois_chars in ['>=', '<=', '==', '!=']:
+                        return True
+                
+                # Verificar operadores simples
+                if expressao[i] in ['+', '-', '*', '/', '%', '>', '<']:
+                    return True
+            i += 1
         return False
     
     def dividir_expressao(self, expressao, operador):
