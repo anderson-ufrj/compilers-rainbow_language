@@ -24,14 +24,11 @@ class RainbowSplashScreen:
         self.message_index = 0
         self.animation_done = False
         
-        # Mensagens de carregamento mágicas
+        # Mensagens de carregamento mágicas (reduzidas)
         self.messages = [
             "Estabelecendo as cores do arco-íris...",
             "Convidando o analisador léxico...",
-            "Despertando a gramática...",
-            "Preparando tokens encantados...",
             "Inicializando a semântica...",
-            "Carregando símbolos místicos...",
             "Pronto para compilar magia."
         ]
         
@@ -48,37 +45,40 @@ class RainbowSplashScreen:
             self.canvas.create_line(0, i, self.width, i, fill=color, width=1)
     
     def create_rainbow_logo(self):
-        """Cria o logo Rainbow com efeito de arco-íris"""
-        # Título principal Rainbow
+        """Cria o logo Rainbow centralizado"""
         center_x = self.width // 2
-        center_y = self.height // 3
+        center_y = self.height // 3 - 30
         
-        # Cada letra do Rainbow com cor diferente
-        rainbow_text = "RAINBOW"
-        letter_width = 60
-        start_x = center_x - (len(rainbow_text) * letter_width) // 2
-        
-        for i, letter in enumerate(rainbow_text):
-            x = start_x + (i * letter_width)
-            color = self.rainbow_colors[i % len(self.rainbow_colors)]
-            
-            # Criar letra com efeito de sombra
-            shadow = self.canvas.create_text(x + 3, center_y + 3, 
-                                           text=letter, 
+        # Título Rainbow em uma cor só (branco)
+        self.title = self.canvas.create_text(center_x, center_y, 
+                                           text="RAINBOW", 
                                            font=("Impact", 48, "bold"),
-                                           fill="#333333")
+                                           fill="#FFFFFF",
+                                           state='hidden')
+        
+        # Arco-íris tradicional (barras coloridas)
+        self.create_traditional_rainbow()
+    
+    def create_traditional_rainbow(self):
+        """Cria o arco-íris tradicional com barras"""
+        # Posição do arco-íris
+        rainbow_y = self.height // 3 + 20
+        rainbow_width = 400
+        rainbow_height = 40
+        start_x = (self.width - rainbow_width) // 2
+        
+        bar_width = rainbow_width // len(self.colors)
+        
+        for i, color in enumerate(self.colors):
+            x1 = start_x + (i * bar_width)
+            x2 = x1 + bar_width
+            y1 = rainbow_y
+            y2 = rainbow_y + rainbow_height
             
-            # Letra principal (inicialmente oculta)
-            letter_obj = self.canvas.create_text(x, center_y, 
-                                                text=letter, 
-                                                font=("Impact", 48, "bold"),
-                                                fill=color,
-                                                state='hidden')
-            
-            # Sombra também oculta inicialmente
-            self.canvas.itemconfig(shadow, state='hidden')
-            
-            self.letters.append((letter_obj, shadow, color))
+            bar = self.canvas.create_rectangle(x1, y1, x1, y2, 
+                                             fill=color, outline=color,
+                                             state='hidden')
+            self.bars.append(bar)
     
     def create_credits(self):
         """Cria os créditos do projeto"""
@@ -135,42 +135,38 @@ class RainbowSplashScreen:
         self.canvas.after(200, self.animate_rainbow_appear)
     
     def animate_rainbow_appear(self):
-        """Animação de aparição do logo Rainbow"""
-        def show_letter(index):
-            if index < len(self.letters):
-                letter_obj, shadow, color = self.letters[index]
-                
-                # Fade in da letra
-                self.fade_in_letter(letter_obj, shadow, color, 0)
-                
-                # Próxima letra após 150ms
-                self.canvas.after(150, lambda: show_letter(index + 1))
-            else:
-                # Todas as letras apareceram, mostrar créditos
-                self.canvas.after(500, self.animate_credits_appear)
+        """Animação de aparição do logo Rainbow e arco-íris"""
+        # Mostrar título
+        self.canvas.itemconfig(self.title, state='normal')
         
-        show_letter(0)
+        # Animar barras do arco-íris
+        self.animate_rainbow_bars(0)
     
-    def fade_in_letter(self, letter_obj, shadow, color, alpha):
-        """Fade in suave de uma letra"""
-        # Simplesmente mostrar a letra
-        self.canvas.itemconfig(letter_obj, state='normal')
-        self.canvas.itemconfig(shadow, state='normal')
-        
-        # Adicionar efeito de glow após um pequeno delay
-        self.canvas.after(100, lambda: self.add_glow_effect(letter_obj, color))
+    def animate_rainbow_bars(self, step):
+        """Anima as barras do arco-íris expandindo"""
+        if step <= 100:
+            for i, bar in enumerate(self.bars):
+                # Mostrar barra
+                self.canvas.itemconfig(bar, state='normal')
+                
+                # Expandir barra
+                coords = self.canvas.coords(bar)
+                if len(coords) >= 4:
+                    x1, y1, x2, y2 = coords
+                    rainbow_width = 400
+                    bar_width = rainbow_width // len(self.colors)
+                    start_x = (self.width - rainbow_width) // 2
+                    
+                    target_x2 = start_x + ((i + 1) * bar_width)
+                    current_width = (target_x2 - x1) * (step / 100)
+                    
+                    self.canvas.coords(bar, x1, y1, x1 + current_width, y2)
+            
+            self.canvas.after(20, lambda: self.animate_rainbow_bars(step + 2))
+        else:
+            # Arco-íris completo, mostrar créditos
+            self.canvas.after(300, self.animate_credits_appear)
     
-    def add_glow_effect(self, letter_obj, color):
-        """Adiciona efeito de brilho às letras"""
-        # Criar uma cópia ligeiramente deslocada para simular glow
-        coords = self.canvas.coords(letter_obj)
-        text = self.canvas.itemcget(letter_obj, 'text')
-        font = self.canvas.itemcget(letter_obj, 'font')
-        
-        # Criar apenas uma sombra colorida para glow
-        self.canvas.create_text(coords[0] + 1, coords[1] + 1,
-                              text=text, font=font, fill=color, 
-                              state='normal')
     
     def animate_credits_appear(self):
         """Animação de aparição dos créditos"""
@@ -224,11 +220,11 @@ class RainbowSplashScreen:
             
             # Continuar digitando
             if char_index < len(message):
-                self.canvas.after(50, lambda: self.type_message(message, char_index + 1))
+                self.canvas.after(30, lambda: self.type_message(message, char_index + 1))
             else:
                 # Mensagem completa, aguardar e próxima
                 self.message_index += 1
-                self.canvas.after(600, self.animate_next_message)
+                self.canvas.after(400, self.animate_next_message)
     
     def show_final_tip(self):
         """Mostra dica final antes de fechar"""
@@ -246,8 +242,8 @@ class RainbowSplashScreen:
                                      fill="#FFD700",
                                      state='normal')
         
-        # Aguardar 2.5 segundos e fechar (total ~6 segundos)
-        self.canvas.after(2500, self.finish_animation)
+        # Aguardar 1 segundo e fechar (total ~3 segundos)
+        self.canvas.after(1000, self.finish_animation)
     
     def finish_animation(self):
         """Finaliza a animação"""
@@ -310,7 +306,10 @@ class RainbowIDE:
         # Configurar estilo macOS/Linux
         self.setup_native_style()
         
-        # Mostrar animação de abertura
+        # Configurar interface primeiro
+        self.setup_ui()
+        
+        # Mostrar animação de abertura (sobreposta)
         self.show_splash_screen()
         
     def apply_theme(self, theme_name):
@@ -368,7 +367,6 @@ class RainbowIDE:
         
     def close_splash(self):
         self.splash.destroy()
-        self.setup_ui()
         
     def setup_ui(self):
         # Configurar estilo
