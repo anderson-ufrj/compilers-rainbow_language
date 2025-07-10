@@ -984,6 +984,10 @@ class RainbowIDE:
         output_text.insert("end", "🌈 Iniciando execução...\n\n")
         output_text.update()
         
+        # Inicializar sistema de entrada
+        self.executor_widgets['pending_input'] = None
+        self.executor_widgets['input_event'] = None
+        
         # Configurar entrada visual
         def handle_input():
             valor = input_entry.get()
@@ -995,12 +999,12 @@ class RainbowIDE:
             input_button.pack_forget()
             
             # Mostrar valor na saída
-            output_text.insert("end", f"➤ {valor}\n")
+            output_text.insert("end", f"➤ {valor}\n\n")
             output_text.see("end")
             output_text.update()
             
             # Sinalizar que a entrada foi recebida
-            if self.executor_widgets['input_event']:
+            if self.executor_widgets.get('input_event'):
                 self.executor_widgets['pending_input'] = valor
                 self.executor_widgets['input_event'].set()
         
@@ -1010,18 +1014,74 @@ class RainbowIDE:
         input_button.config(command=handle_input)
         input_entry.bind('<Return>', on_enter)
         
-        # Executar em thread
-        thread = threading.Thread(target=self._execute_visual_thread, 
-                                 args=(output_text, input_label, input_entry, input_button, execute_btn))
-        thread.daemon = True
-        thread.start()
-    
-    def _execute_visual_thread(self, output_text, input_label, input_entry, input_button, execute_btn):
-        """Thread para executar no executor visual"""
+        # DEBUG: Testar primeiro sem threading
         try:
+            # Mostrar debug
+            output_text.insert("end", "DEBUG: Testando execução...\n")
+            output_text.update()
+            
             # Importar interpretador
             sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
             from interpretador_rainbow import InterpretadorRainbow
+            
+            output_text.insert("end", "DEBUG: Interpretador importado...\n")
+            output_text.update()
+            
+            # Criar interpretador - usar dialog temporariamente
+            def entrada_simples(prompt):
+                valor = tk.simpledialog.askstring("Entrada", prompt, parent=self.root)
+                output_text.insert("end", f"🔸 {prompt} {valor}\n")
+                output_text.update()
+                return valor or ""
+            
+            interpretador = InterpretadorRainbow(ide_callback=entrada_simples)
+            
+            output_text.insert("end", "DEBUG: Executando arquivo...\n")
+            output_text.update()
+            
+            # Executar
+            sucesso, resultado = interpretador.executar_arquivo(self.current_file)
+            
+            # Mostrar resultado
+            if sucesso:
+                output_text.insert("end", f"\n🟢 SAÍDA DO PROGRAMA:\n{resultado}\n")
+                output_text.insert("end", "\n✅ Sucesso!\n")
+            else:
+                output_text.insert("end", f"\n🔴 ERRO:\n{resultado}\n")
+                self.highlight_error_line(resultado)
+                
+        except Exception as e:
+            output_text.insert("end", f"\n💥 EXCEÇÃO: {str(e)}\n")
+            output_text.insert("end", f"Tipo: {type(e).__name__}\n")
+            import traceback
+            output_text.insert("end", f"Traceback:\n{traceback.format_exc()}\n")
+        
+        finally:
+            execute_btn.config(state=tk.NORMAL, text="▶️ Executar")
+            output_text.see("end")
+    
+    def _execute_visual_thread(self, output_text, execute_btn):
+        """Thread para executar no executor visual"""
+        try:
+            # Mostrar início da execução
+            def show_start():
+                output_text.insert("end", "Compilando arquivo...\n")
+                output_text.see("end")
+                output_text.update()
+            
+            self.root.after(0, show_start)
+            
+            # Importar interpretador
+            sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
+            from interpretador_rainbow import InterpretadorRainbow
+            
+            # Mostrar status
+            def show_interpreting():
+                output_text.insert("end", "Iniciando interpretação...\n\n")
+                output_text.see("end")
+                output_text.update()
+            
+            self.root.after(0, show_interpreting)
             
             # Criar interpretador com callback visual
             interpretador = InterpretadorRainbow(ide_callback=self.solicitar_entrada_visual)
@@ -1032,10 +1092,15 @@ class RainbowIDE:
             # Atualizar interface na thread principal
             def update_ui():
                 if sucesso:
-                    output_text.insert("end", f"\n{resultado}\n")
+                    # Mostrar saída do programa
+                    linhas_saida = resultado.split('\n')
+                    for linha in linhas_saida:
+                        if linha.strip():
+                            output_text.insert("end", f"{linha}\n")
+                    
                     output_text.insert("end", "\n✅ Programa executado com sucesso!\n")
                 else:
-                    output_text.insert("end", f"\n❌ Erro: {resultado}\n")
+                    output_text.insert("end", f"❌ Erro: {resultado}\n")
                     # Destacar linha com erro no editor principal
                     self.highlight_error_line(resultado)
                 
@@ -1046,7 +1111,8 @@ class RainbowIDE:
             
         except Exception as e:
             def show_error():
-                output_text.insert("end", f"\n❌ Erro: {str(e)}\n")
+                output_text.insert("end", f"❌ Erro inesperado: {str(e)}\n")
+                output_text.insert("end", f"Detalhes: {type(e).__name__}\n")
                 self.highlight_error_line(str(e))
                 output_text.see("end")
                 execute_btn.config(state=tk.NORMAL, text="▶️ Executar")
@@ -1055,30 +1121,43 @@ class RainbowIDE:
     
     def solicitar_entrada_visual(self, prompt):
         """Solicita entrada no executor visual"""
+        if not hasattr(self, 'executor_widgets'):
+            # Fallback para dialog se não houver executor visual
+            return tk.simpledialog.askstring("Entrada", prompt, parent=self.root) or ""
+        
         resultado = [None]
         evento = threading.Event()
         
         def mostrar_entrada():
-            # Mostrar prompt na saída
-            self.executor_widgets['output'].insert("end", f"\n📝 {prompt}\n")
-            self.executor_widgets['output'].see("end")
-            
-            # Mostrar campos de entrada
-            self.executor_widgets['input_label'].config(text=prompt)
-            self.executor_widgets['input_label'].pack(pady=(5, 0))
-            self.executor_widgets['input_entry'].pack(fill=tk.X, pady=5)
-            self.executor_widgets['input_button'].pack()
-            
-            # Focar no campo de entrada
-            self.executor_widgets['input_entry'].focus_set()
-            
-            # Configurar evento
-            self.executor_widgets['input_event'] = evento
+            try:
+                # Mostrar prompt na saída
+                self.executor_widgets['output'].insert("end", f"📝 {prompt}\n")
+                self.executor_widgets['output'].see("end")
+                self.executor_widgets['output'].update()
+                
+                # Mostrar campos de entrada
+                self.executor_widgets['input_label'].config(text=prompt)
+                self.executor_widgets['input_label'].pack(pady=(5, 0))
+                self.executor_widgets['input_entry'].pack(fill=tk.X, pady=5)
+                self.executor_widgets['input_button'].pack()
+                
+                # Focar no campo de entrada
+                self.executor_widgets['input_entry'].focus_set()
+                
+                # Configurar evento
+                self.executor_widgets['input_event'] = evento
+                
+            except Exception as e:
+                print(f"Erro ao mostrar entrada: {e}")
+                # Fallback para dialog
+                valor = tk.simpledialog.askstring("Entrada", prompt, parent=self.root) or ""
+                resultado[0] = valor
+                evento.set()
         
         self.root.after(0, mostrar_entrada)
         evento.wait()  # Aguardar entrada
         
-        return self.executor_widgets['pending_input'] or ""
+        return self.executor_widgets.get('pending_input', "") or resultado[0] or ""
     
     def highlight_error_line(self, error_message):
         """Destaca linha com erro no editor"""
