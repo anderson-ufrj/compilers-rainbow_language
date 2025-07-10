@@ -1,0 +1,18 @@
+RAINBOW.
+
+// Erro: falta ponto final
+#nome recebe "João"
+
+// Erro: falta parênteses no se
+se #idade > 18 {
+    mostrar("Maior de idade").
+}
+
+// Erro: falta chave de fechamento
+para #i de 1 ate 10 passo 1 {
+    mostrar(#i).
+// Aqui deveria ter }
+
+// Programa válido no final
+#x recebe 5.
+mostrar(#x).

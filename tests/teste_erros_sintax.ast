@@ -1,0 +1,22 @@
+=== ÁRVORE SINTÁTICA ABSTRATA ===
+Gerado em: 2025-07-10 08:49:41
+
+PROGRAMA: RAINBOW (L:1, C:1)
+  CONDICIONAL: se (L:7, C:1)
+    EXPRESSAO_BINARIA: > (L:7, C:11)
+      VARIAVEL: #idade (L:7, C:4)
+      LITERAL: 18 (L:7, C:13)
+    BLOCO: bloco (L:7, C:16)
+      CHAMADA_FUNCAO: mostrar (L:8, C:5)
+        LITERAL: "Maior de idade" (L:8, C:13)
+  LACO_PARA: #i (L:12, C:1)
+    LITERAL: 1 (L:12, C:12)
+    LITERAL: 10 (L:12, C:18)
+    LITERAL: 1 (L:12, C:27)
+    BLOCO: bloco (L:12, C:29)
+      CHAMADA_FUNCAO: mostrar (L:13, C:5)
+        VARIAVEL: #i (L:13, C:13)
+      ATRIBUICAO: #x (L:17, C:1)
+        LITERAL: 5 (L:17, C:11)
+      CHAMADA_FUNCAO: mostrar (L:18, C:1)
+        VARIAVEL: #x (L:18, C:9)

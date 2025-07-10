@@ -1,0 +1,78 @@
+=== ESTATÍSTICAS DA ANÁLISE LÉXICA ===
+Gerado em: 2025-07-10 08:49:41
+
+=== MÉTRICAS GERAIS ===
+Total de linhas: 4
+Total de caracteres: 43
+Total de tokens: 11
+Total de erros: 0
+Taxa de erro: 0.00%
+
+=== DISTRIBUIÇÃO DE TOKENS ===
+ABRE_CHAVES: 10
+ABRE_PARENTESES: 23
+ATE: 2
+DE: 2
+ENQUANTO: 1
+FALSO: 1
+FECHA_CHAVES: 8
+FECHA_PARENTESES: 22
+FIM_LINHA: 40
+LER: 2
+MOSTRAR: 14
+NUMERO: 20
+OPER_ATRIBUICAO: 22
+OPER_DIVISAO: 1
+OPER_E: 1
+OPER_IGUAL: 1
+OPER_MAIOR: 3
+OPER_MAIOR_IGUAL: 1
+OPER_MENOR: 1
+OPER_MODULO: 1
+OPER_MULTIPLICACAO: 2
+OPER_SOMA: 8
+OPER_SUBTRACAO: 1
+PARA: 2
+PASSO: 2
+RAINBOW: 5
+SE: 6
+SENAO: 1
+TEXTO: 17
+VARIAVEL: 51
+VERDADEIRO: 1
+
+=== PALAVRAS RESERVADAS UTILIZADAS ===
+- E
+- Falso
+- RAINBOW
+- Verdadeiro
+- ate
+- de
+- enquanto
+- igual
+- ler
+- mostrar
+- para
+- passo
+- recebe
+- se
+- senao
+
+=== VARIÁVEIS DECLARADAS ===
+- #a
+- #b
+- #contador
+- #div
+- #grande
+- #i
+- #idade
+- #mod
+- #mult
+- #nome
+- #resultado
+- #soma
+- #sub
+- #teste
+- #valor
+- #x
+- #y

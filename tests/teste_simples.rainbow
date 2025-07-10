@@ -1,0 +1,4 @@
+RAINBOW.
+
+#nome recebe "João".
+mostrar(#nome).
