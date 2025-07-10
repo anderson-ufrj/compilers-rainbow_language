@@ -214,7 +214,6 @@ compilers-rainbow_language/
 ├── docs/
 │   ├── Requisitos Técnicos.md
 │   └── 🌈Rainbow✨ - Compiladores.pdf
-├── CLAUDE.md
 ├── README.md
 └── .gitignore
 ```
@@ -323,7 +322,7 @@ enquanto (#acertou igual Falso) {
 
 ## 🤝 Agradecimentos
 
-- **Professor(a)** da disciplina de Compiladores
+
 - **[Claude Code](https://claude.ai/code)** - IA assistente no desenvolvimento
 - **Comunidade Python** - Ferramentas e bibliotecas
 
