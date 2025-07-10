@@ -24,11 +24,15 @@ class RainbowSplashScreen:
         self.message_index = 0
         self.animation_done = False
         
-        # Mensagens de carregamento mágicas (reduzidas)
+        # Mensagens de carregamento mágicas (completas)
         self.messages = [
             "Estabelecendo as cores do arco-íris...",
             "Convidando o analisador léxico...",
+            "Despertando a gramática...",
+            "Preparando tokens encantados...",
             "Inicializando a semântica...",
+            "Carregando símbolos místicos...",
+            "Chamando todos os unicórnios disponíveis...",
             "Pronto para compilar magia."
         ]
         
@@ -212,30 +216,84 @@ class RainbowSplashScreen:
             
             # Continuar digitando
             if char_index < len(message):
-                self.canvas.after(30, lambda: self.type_message(message, char_index + 1))
+                self.canvas.after(25, lambda: self.type_message(message, char_index + 1))
             else:
                 # Mensagem completa, aguardar e próxima
                 self.message_index += 1
-                self.canvas.after(400, self.animate_next_message)
+                self.canvas.after(300, self.animate_next_message)
     
     def show_final_tip(self):
-        """Mostra dica final antes de fechar"""
+        """Mostra dica final e botão para lançar IDE"""
         # Limpar mensagem de loading
         self.canvas.itemconfig(self.loading_text, text="")
         self.canvas.itemconfig(self.cursor, state='hidden')
         
         # Mostrar dica final
         center_x = self.width // 2
-        y = self.height - 80
+        tip_y = self.height - 120
         
-        tip = self.canvas.create_text(center_x, y,
+        tip = self.canvas.create_text(center_x, tip_y,
                                      text="💡 Clique na seção Ajuda para acessar a documentação do compilador.",
                                      font=("Segoe UI", 11, "italic"),
                                      fill="#FFD700",
                                      state='normal')
         
-        # Aguardar 1 segundo e fechar (total ~3 segundos)
-        self.canvas.after(1000, self.finish_animation)
+        # Criar botão para lançar IDE
+        self.create_launch_button()
+    
+    def create_launch_button(self):
+        """Cria botão para lançar a IDE"""
+        center_x = self.width // 2
+        button_y = self.height - 60
+        
+        # Fundo do botão
+        button_width = 200
+        button_height = 40
+        x1 = center_x - button_width // 2
+        x2 = center_x + button_width // 2
+        y1 = button_y - button_height // 2
+        y2 = button_y + button_height // 2
+        
+        # Criar retângulo do botão com gradiente simulado
+        self.button_bg = self.canvas.create_rectangle(x1, y1, x2, y2,
+                                                    fill="#4CAF50",
+                                                    outline="#45a049",
+                                                    width=2)
+        
+        # Texto do botão
+        self.button_text = self.canvas.create_text(center_x, button_y,
+                                                 text="🚀 Lançar Rainbow IDE",
+                                                 font=("Segoe UI", 12, "bold"),
+                                                 fill="#FFFFFF")
+        
+        # Bind do clique
+        self.canvas.tag_bind(self.button_bg, "<Button-1>", self.launch_ide)
+        self.canvas.tag_bind(self.button_text, "<Button-1>", self.launch_ide)
+        
+        # Efeitos hover
+        self.canvas.tag_bind(self.button_bg, "<Enter>", self.on_button_hover)
+        self.canvas.tag_bind(self.button_text, "<Enter>", self.on_button_hover)
+        self.canvas.tag_bind(self.button_bg, "<Leave>", self.on_button_leave)
+        self.canvas.tag_bind(self.button_text, "<Leave>", self.on_button_leave)
+        
+        # Configurar cursor
+        self.canvas.config(cursor="hand2")
+        self.canvas.bind("<Enter>", lambda e: self.canvas.config(cursor="hand2"))
+        self.canvas.bind("<Leave>", lambda e: self.canvas.config(cursor=""))
+    
+    def on_button_hover(self, event):
+        """Efeito hover do botão"""
+        self.canvas.itemconfig(self.button_bg, fill="#45a049")
+    
+    def on_button_leave(self, event):
+        """Sair do hover do botão"""
+        self.canvas.itemconfig(self.button_bg, fill="#4CAF50")
+    
+    def launch_ide(self, event):
+        """Lança a IDE quando botão é clicado"""
+        # Efeito de clique
+        self.canvas.itemconfig(self.button_bg, fill="#3e8e41")
+        self.canvas.after(100, self.finish_animation)
     
     def finish_animation(self):
         """Finaliza a animação"""
