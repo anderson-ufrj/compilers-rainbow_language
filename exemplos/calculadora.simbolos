@@ -1,0 +1,15 @@
+=== TABELA DE SÍMBOLOS ===
+Gerado em: 2025-07-10 13:43:13
+
+=== SÍMBOLOS DECLARADOS ===
+✓ #b | Tipo: NUMERO | Escopo: GLOBAL | Linha: 05, Coluna: 08
+✓ #soma | Tipo: INDEFINIDO | Escopo: GLOBAL | Linha: 12, Coluna: 08
+✓ #a | Tipo: INDEFINIDO | Escopo: GLOBAL | Linha: 12, Coluna: 21
+✓ #subtracao | Tipo: NUMERO | Escopo: GLOBAL | Linha: 15, Coluna: 08
+✓ #multiplicacao | Tipo: NUMERO | Escopo: GLOBAL | Linha: 18, Coluna: 08
+✓ #divisao | Tipo: NUMERO | Escopo: GLOBAL | Linha: 21, Coluna: 08
+
+=== RESUMO ===
+Total de símbolos: 6
+Total de erros: 4
+Total de avisos: 1

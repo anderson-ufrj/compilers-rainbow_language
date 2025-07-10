@@ -1,31 +1,31 @@
-RAINBOW
+RAINBOW.
 
 // Demonstração dos tipos de dados
-mostrar "=== TIPOS DE DADOS ===".
+mostrar("=== TIPOS DE DADOS ===").
 
 // Números
-GLOBAL NUMERO #inteiro recebe 42.
-GLOBAL NUMERO #decimal recebe 3.14.
-mostrar "Inteiro: " + #inteiro.
-mostrar "Decimal: " + #decimal.
+#inteiro recebe 42.
+#decimal recebe 3.14.
+mostrar("Inteiro: " + #inteiro).
+mostrar("Decimal: " + #decimal).
 
 // Texto
-GLOBAL TEXTO #mensagem recebe "Olá Rainbow!".
-GLOBAL TEXTO #caractere recebe "A".
-mostrar "Mensagem: " + #mensagem.
-mostrar "Caractere: " + #caractere.
+#mensagem recebe "Olá Rainbow!".
+#caractere recebe "A".
+mostrar("Mensagem: " + #mensagem).
+mostrar("Caractere: " + #caractere).
 
 // Lógico
-GLOBAL LOGICO #verdadeiro recebe verdadeiro.
-GLOBAL LOGICO #falso recebe falso.
-mostrar "Verdadeiro: " + #verdadeiro.
-mostrar "Falso: " + #falso.
+#verdadeiro recebe Verdadeiro.
+#falso recebe Falso.
+mostrar("Verdadeiro: " + #verdadeiro).
+mostrar("Falso: " + #falso).
 
 // Operações lógicas
-GLOBAL LOGICO #resultado_e recebe #verdadeiro e #falso.
-GLOBAL LOGICO #resultado_ou recebe #verdadeiro ou #falso.
-GLOBAL LOGICO #resultado_nao recebe nao #verdadeiro.
+#resultado_e recebe #verdadeiro E #falso.
+#resultado_ou recebe #verdadeiro OU #falso.
+#resultado_nao recebe NAO #verdadeiro.
 
-mostrar "true E false = " + #resultado_e.
-mostrar "true OU false = " + #resultado_ou.
-mostrar "NÃO true = " + #resultado_nao.
+mostrar("Verdadeiro E Falso = " + #resultado_e).
+mostrar("Verdadeiro OU Falso = " + #resultado_ou).
+mostrar("NAO Verdadeiro = " + #resultado_nao).

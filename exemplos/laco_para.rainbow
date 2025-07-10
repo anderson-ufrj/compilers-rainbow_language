@@ -1,23 +1,21 @@
-RAINBOW
+RAINBOW.
 
 // Exemplo de laço PARA
-GLOBAL #soma recebe 0.
+#soma recebe 0.
 
-mostrar "Calculando soma de 1 a 10:".
+mostrar("Calculando soma de 1 a 10:").
 
-para #i de 1 ate 10:
-LACO
-    LACO #soma recebe #soma + #i.
-    mostrar "Adicionando " + #i + ", soma atual: " + #soma.
-LACO
+para #i de 1 ate 10 passo 1 {
+    #soma recebe #soma + #i.
+    mostrar("Adicionando " + #i + ", soma atual: " + #soma).
+}
 
-mostrar "Soma final: " + #soma.
+mostrar("Soma final: " + #soma).
 
-// Exemplo com step
-mostrar "".
-mostrar "Números pares de 2 a 20:".
+// Exemplo com step diferente
+mostrar("").
+mostrar("Números pares de 2 a 20:").
 
-para #par de 2 ate 20 passo 2:
-LACO
-    mostrar #par.
-LACO
+para #par de 2 ate 20 passo 2 {
+    mostrar(#par).
+}

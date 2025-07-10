@@ -1,16 +1,15 @@
-RAINBOW
+RAINBOW.
 
 // Programa para calcular tabuada
-GLOBAL #numero recebe 5.
-GLOBAL #i recebe 1.
+#numero recebe 5.
+#i recebe 1.
 
-mostrar "Tabuada do " + #numero + ":".
+mostrar("Tabuada do " + #numero + ":").
 
-enquanto #i <= 10:
-BLOCO
-    BLOCO #resultado recebe #numero * #i.
-    mostrar #numero + " x " + #i + " = " + #resultado.
+enquanto (#i <= 10) {
+    #resultado recebe #numero * #i.
+    mostrar(#numero + " x " + #i + " = " + #resultado).
     #i recebe #i + 1.
-BLOCO
+}
 
-mostrar "Fim da tabuada!".
+mostrar("Fim da tabuada!").

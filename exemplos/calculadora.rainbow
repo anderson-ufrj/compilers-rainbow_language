@@ -1,22 +1,22 @@
-RAINBOW
+RAINBOW.
 
 // Calculadora simples
-GLOBAL #a recebe 10.
-GLOBAL #b recebe 5.
+#a recebe 10.
+#b recebe 5.
 
-mostrar "=== CALCULADORA ===".
-mostrar "Número A: " + #a.
-mostrar "Número B: " + #b.
-mostrar "".
+mostrar("=== CALCULADORA ===").
+mostrar("Número A: " + #a).
+mostrar("Número B: " + #b).
+mostrar("").
 
-GLOBAL #soma recebe #a + #b.
-mostrar "Soma: " + #a + " + " + #b + " = " + #soma.
+#soma recebe #a + #b.
+mostrar("Soma: " + #a + " + " + #b + " = " + #soma).
 
-GLOBAL #subtracao recebe #a - #b.
-mostrar "Subtração: " + #a + " - " + #b + " = " + #subtracao.
+#subtracao recebe #a - #b.
+mostrar("Subtração: " + #a + " - " + #b + " = " + #subtracao).
 
-GLOBAL #multiplicacao recebe #a * #b.
-mostrar "Multiplicação: " + #a + " * " + #b + " = " + #multiplicacao.
+#multiplicacao recebe #a * #b.
+mostrar("Multiplicação: " + #a + " * " + #b + " = " + #multiplicacao).
 
-GLOBAL #divisao recebe #a / #b.
-mostrar "Divisão: " + #a + " / " + #b + " = " + #divisao.
+#divisao recebe #a / #b.
+mostrar("Divisão: " + #a + " / " + #b + " = " + #divisao).
