@@ -10,53 +10,250 @@ import threading
 import time
 from pathlib import Path
 
-class RainbowAnimation:
+class RainbowSplashScreen:
     def __init__(self, canvas, width, height):
         self.canvas = canvas
         self.width = width
         self.height = height
         self.colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']
+        self.rainbow_colors = ['#FF6B6B', '#FFE66D', '#A8E6CF', '#88D8C0', '#81C7D4', '#A8A8F0', '#D4A8D4']
         self.bars = []
+        self.letters = []
+        self.credits = []
+        self.loading_messages = []
+        self.message_index = 0
         self.animation_done = False
         
-    def create_rainbow(self):
-        bar_height = self.height / len(self.colors)
-        for i, color in enumerate(self.colors):
-            y1 = i * bar_height
-            y2 = (i + 1) * bar_height
-            bar = self.canvas.create_rectangle(0, y1, 0, y2, fill=color, outline=color)
-            self.bars.append(bar)
+        # Mensagens de carregamento mágicas
+        self.messages = [
+            "Estabelecendo as cores do arco-íris...",
+            "Convidando o analisador léxico...",
+            "Despertando a gramática...",
+            "Preparando tokens encantados...",
+            "Inicializando a semântica...",
+            "Carregando símbolos místicos...",
+            "Pronto para compilar magia."
+        ]
+        
+    def create_background_gradient(self):
+        """Cria um fundo gradiente suave"""
+        # Gradiente vertical do preto para azul escuro
+        for i in range(self.height):
+            ratio = i / self.height
+            # Transição suave do preto (#000000) para azul escuro (#1a1a2e)
+            r = int(26 * ratio)
+            g = int(26 * ratio)
+            b = int(46 * ratio)
+            color = f'#{r:02X}{g:02X}{b:02X}'
+            self.canvas.create_line(0, i, self.width, i, fill=color, width=1)
+    
+    def create_rainbow_logo(self):
+        """Cria o logo Rainbow com efeito de arco-íris"""
+        # Título principal Rainbow
+        center_x = self.width // 2
+        center_y = self.height // 3
+        
+        # Cada letra do Rainbow com cor diferente
+        rainbow_text = "RAINBOW"
+        letter_width = 60
+        start_x = center_x - (len(rainbow_text) * letter_width) // 2
+        
+        for i, letter in enumerate(rainbow_text):
+            x = start_x + (i * letter_width)
+            color = self.rainbow_colors[i % len(self.rainbow_colors)]
+            
+            # Criar letra com efeito de sombra
+            shadow = self.canvas.create_text(x + 3, center_y + 3, 
+                                           text=letter, 
+                                           font=("Impact", 48, "bold"),
+                                           fill="#333333")
+            
+            # Letra principal (inicialmente oculta)
+            letter_obj = self.canvas.create_text(x, center_y, 
+                                                text=letter, 
+                                                font=("Impact", 48, "bold"),
+                                                fill=color,
+                                                state='hidden')
+            
+            # Sombra também oculta inicialmente
+            self.canvas.itemconfig(shadow, state='hidden')
+            
+            self.letters.append((letter_obj, shadow, color))
+    
+    def create_credits(self):
+        """Cria os créditos do projeto"""
+        center_x = self.width // 2
+        base_y = self.height // 3 + 80
+        
+        credits_text = [
+            ("Projeto de Compiladores – IF Sul de Minas", 16, "#E0E0E0"),
+            ("Professor Hudson", 14, "#B0B0B0"),
+            ("Desenvolvido por Anderson Henrique e Lurian Letícia", 14, "#B0B0B0")
+        ]
+        
+        for i, (text, size, color) in enumerate(credits_text):
+            y = base_y + (i * 25)
+            credit = self.canvas.create_text(center_x, y,
+                                           text=text,
+                                           font=("Segoe UI", size),
+                                           fill=color,
+                                           state='hidden')
+            self.credits.append(credit)
+    
+    def create_loading_area(self):
+        """Cria área para mensagens de carregamento"""
+        center_x = self.width // 2
+        y = self.height - 120
+        
+        # Área de loading
+        self.loading_text = self.canvas.create_text(center_x, y,
+                                                   text="",
+                                                   font=("Consolas", 12),
+                                                   fill="#00FF88",
+                                                   state='hidden')
+        
+        # Cursor piscante
+        self.cursor = self.canvas.create_text(center_x + 100, y,
+                                            text="█",
+                                            font=("Consolas", 12),
+                                            fill="#00FF88",
+                                            state='hidden')
     
     def animate(self, callback=None):
-        self.create_rainbow()
-        self.expand_bars(0, callback)
+        """Inicia toda a sequência de animação"""
+        self.callback = callback
+        
+        # 1. Criar fundo gradiente
+        self.create_background_gradient()
+        
+        # 2. Criar elementos (ocultos inicialmente)
+        self.create_rainbow_logo()
+        self.create_credits()
+        self.create_loading_area()
+        
+        # 3. Iniciar sequência de animações
+        self.canvas.after(200, self.animate_rainbow_appear)
     
-    def expand_bars(self, step, callback):
-        if step <= 100:
-            width = (self.width / 100) * step
-            for bar in self.bars:
-                self.canvas.coords(bar, 0, self.canvas.coords(bar)[1], width, self.canvas.coords(bar)[3])
-            self.canvas.after(20, lambda: self.expand_bars(step + 1, callback))
-        else:
-            self.fade_out(20, callback)
+    def animate_rainbow_appear(self):
+        """Animação de aparição do logo Rainbow"""
+        def show_letter(index):
+            if index < len(self.letters):
+                letter_obj, shadow, color = self.letters[index]
+                
+                # Fade in da letra
+                self.fade_in_letter(letter_obj, shadow, color, 0)
+                
+                # Próxima letra após 150ms
+                self.canvas.after(150, lambda: show_letter(index + 1))
+            else:
+                # Todas as letras apareceram, mostrar créditos
+                self.canvas.after(500, self.animate_credits_appear)
+        
+        show_letter(0)
     
-    def fade_out(self, alpha, callback):
-        if alpha >= 0:
-            self.canvas.configure(bg=f'#{alpha:X}{alpha:X}{alpha:X}')
-            for bar in self.bars:
-                color = self.canvas.itemcget(bar, 'fill')
-                if len(color) == 7:
-                    r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
-                    r = int(r * (alpha / 20))
-                    g = int(g * (alpha / 20))
-                    b = int(b * (alpha / 20))
-                    new_color = f'#{r:02X}{g:02X}{b:02X}'
-                    self.canvas.itemconfig(bar, fill=new_color, outline=new_color)
-            self.canvas.after(50, lambda: self.fade_out(alpha - 1, callback))
+    def fade_in_letter(self, letter_obj, shadow, color, alpha):
+        """Fade in suave de uma letra"""
+        # Simplesmente mostrar a letra
+        self.canvas.itemconfig(letter_obj, state='normal')
+        self.canvas.itemconfig(shadow, state='normal')
+        
+        # Adicionar efeito de glow após um pequeno delay
+        self.canvas.after(100, lambda: self.add_glow_effect(letter_obj, color))
+    
+    def add_glow_effect(self, letter_obj, color):
+        """Adiciona efeito de brilho às letras"""
+        # Criar uma cópia ligeiramente deslocada para simular glow
+        coords = self.canvas.coords(letter_obj)
+        text = self.canvas.itemcget(letter_obj, 'text')
+        font = self.canvas.itemcget(letter_obj, 'font')
+        
+        # Criar apenas uma sombra colorida para glow
+        self.canvas.create_text(coords[0] + 1, coords[1] + 1,
+                              text=text, font=font, fill=color, 
+                              state='normal')
+    
+    def animate_credits_appear(self):
+        """Animação de aparição dos créditos"""
+        def show_credit(index):
+            if index < len(self.credits):
+                self.canvas.itemconfig(self.credits[index], state='normal')
+                self.canvas.after(300, lambda: show_credit(index + 1))
+            else:
+                # Créditos apareceram, iniciar loading
+                self.canvas.after(800, self.animate_loading_start)
+        
+        show_credit(0)
+    
+    def animate_loading_start(self):
+        """Inicia animação de loading"""
+        self.canvas.itemconfig(self.loading_text, state='normal')
+        self.canvas.itemconfig(self.cursor, state='normal')
+        
+        # Iniciar cursor piscante
+        self.animate_cursor()
+        
+        # Iniciar primeira mensagem
+        self.animate_next_message()
+    
+    def animate_cursor(self):
+        """Animação do cursor piscante"""
+        current_state = self.canvas.itemcget(self.cursor, 'state')
+        new_state = 'hidden' if current_state == 'normal' else 'normal'
+        self.canvas.itemconfig(self.cursor, state=new_state)
+        
+        if not self.animation_done:
+            self.canvas.after(500, self.animate_cursor)
+    
+    def animate_next_message(self):
+        """Anima a próxima mensagem de loading"""
+        if self.message_index < len(self.messages):
+            message = self.messages[self.message_index]
+            self.type_message(message, 0)
         else:
-            self.animation_done = True
-            if callback:
-                callback()
+            # Todas as mensagens foram exibidas, mostrar dica final
+            self.canvas.after(1000, self.show_final_tip)
+    
+    def type_message(self, message, char_index):
+        """Efeito de digitação para as mensagens"""
+        if char_index <= len(message):
+            current_text = message[:char_index]
+            if char_index < len(message):
+                current_text += "█"  # Cursor
+            
+            self.canvas.itemconfig(self.loading_text, text=current_text)
+            
+            # Continuar digitando
+            if char_index < len(message):
+                self.canvas.after(50, lambda: self.type_message(message, char_index + 1))
+            else:
+                # Mensagem completa, aguardar e próxima
+                self.message_index += 1
+                self.canvas.after(600, self.animate_next_message)
+    
+    def show_final_tip(self):
+        """Mostra dica final antes de fechar"""
+        # Limpar mensagem de loading
+        self.canvas.itemconfig(self.loading_text, text="")
+        self.canvas.itemconfig(self.cursor, state='hidden')
+        
+        # Mostrar dica final
+        center_x = self.width // 2
+        y = self.height - 80
+        
+        tip = self.canvas.create_text(center_x, y,
+                                     text="💡 Clique na seção Ajuda para acessar a documentação do compilador.",
+                                     font=("Segoe UI", 11, "italic"),
+                                     fill="#FFD700",
+                                     state='normal')
+        
+        # Aguardar 2.5 segundos e fechar (total ~6 segundos)
+        self.canvas.after(2500, self.finish_animation)
+    
+    def finish_animation(self):
+        """Finaliza a animação"""
+        self.animation_done = True
+        if self.callback:
+            self.callback()
 
 class RainbowIDE:
     def __init__(self, root):
@@ -149,28 +346,24 @@ class RainbowIDE:
             self.macos_padding = 0
         
     def show_splash_screen(self):
-        # Tela de splash com animação
+        # Tela de splash mágica
         self.splash = tk.Toplevel(self.root)
         self.splash.overrideredirect(True)
-        self.splash.configure(bg='black')
+        self.splash.configure(bg='#000000')
         
-        # Centralizar splash
-        width, height = 600, 400
+        # Tamanho maior e centralizar splash
+        width, height = 800, 600
         x = (self.splash.winfo_screenwidth() - width) // 2
         y = (self.splash.winfo_screenheight() - height) // 2
         self.splash.geometry(f"{width}x{height}+{x}+{y}")
         
-        # Canvas para animação
-        canvas = tk.Canvas(self.splash, width=width, height=300, bg='black', highlightthickness=0)
-        canvas.pack()
+        # Canvas para toda a animação
+        canvas = tk.Canvas(self.splash, width=width, height=height, 
+                          bg='#000000', highlightthickness=0)
+        canvas.pack(fill=tk.BOTH, expand=True)
         
-        # Título
-        title_label = tk.Label(self.splash, text="Rainbow IDE", font=("Arial", 36, "bold"),
-                              bg='black', fg='white')
-        title_label.pack(pady=20)
-        
-        # Animação
-        animation = RainbowAnimation(canvas, width, 300)
+        # Iniciar animação mágica
+        animation = RainbowSplashScreen(canvas, width, height)
         animation.animate(callback=self.close_splash)
         
     def close_splash(self):
