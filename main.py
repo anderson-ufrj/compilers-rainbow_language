@@ -37,14 +37,42 @@ class RainbowSplashScreen:
         ]
         
     def create_background_gradient(self):
-        """Cria um fundo gradiente suave"""
-        # Gradiente vertical do preto para azul escuro
+        """Cria um fundo gradiente suave e colorido"""
+        # Gradiente vertical com cores suaves do arco-íris
         for i in range(self.height):
             ratio = i / self.height
-            # Transição suave do preto (#000000) para azul escuro (#1a1a2e)
-            r = int(26 * ratio)
-            g = int(26 * ratio)
-            b = int(46 * ratio)
+            
+            # Criar um gradiente suave com tons pastel do arco-íris
+            if ratio < 0.2:
+                # Topo: azul claro para roxo claro
+                r = int(200 + (220 - 200) * (ratio / 0.2))
+                g = int(220 + (200 - 220) * (ratio / 0.2))
+                b = int(255)
+            elif ratio < 0.4:
+                # Roxo claro para rosa claro
+                local_ratio = (ratio - 0.2) / 0.2
+                r = int(220 + (255 - 220) * local_ratio)
+                g = int(200 + (220 - 200) * local_ratio)
+                b = int(255 - (255 - 240) * local_ratio)
+            elif ratio < 0.6:
+                # Rosa claro para laranja claro
+                local_ratio = (ratio - 0.4) / 0.2
+                r = int(255)
+                g = int(220 + (240 - 220) * local_ratio)
+                b = int(240 - (240 - 200) * local_ratio)
+            elif ratio < 0.8:
+                # Laranja claro para amarelo claro
+                local_ratio = (ratio - 0.6) / 0.2
+                r = int(255 - (255 - 250) * local_ratio)
+                g = int(240 + (255 - 240) * local_ratio)
+                b = int(200 + (240 - 200) * local_ratio)
+            else:
+                # Amarelo claro para verde claro
+                local_ratio = (ratio - 0.8) / 0.2
+                r = int(250 - (250 - 220) * local_ratio)
+                g = int(255)
+                b = int(240 + (250 - 240) * local_ratio)
+            
             color = f'#{r:02X}{g:02X}{b:02X}'
             self.canvas.create_line(0, i, self.width, i, fill=color, width=1)
     
@@ -53,11 +81,11 @@ class RainbowSplashScreen:
         center_x = self.width // 2
         center_y = self.height // 3 - 30
         
-        # Título Rainbow em uma cor só (branco)
+        # Título Rainbow em uma cor só (azul escuro)
         self.title = self.canvas.create_text(center_x, center_y, 
                                            text="RAINBOW", 
                                            font=("Impact", 48, "bold"),
-                                           fill="#FFFFFF",
+                                           fill="#1a237e",
                                            state='hidden')
         
         # Arco-íris tradicional (barras coloridas)
@@ -88,9 +116,9 @@ class RainbowSplashScreen:
         base_y = self.height // 3 + 80
         
         credits_text = [
-            ("Projeto de Compiladores – IF Sul de Minas", 16, "#E0E0E0"),
-            ("Professor Hudson", 14, "#B0B0B0"),
-            ("Desenvolvido por Anderson Henrique e Lurian Letícia", 14, "#B0B0B0")
+            ("Projeto de Compiladores – IF Sul de Minas", 16, "#2c3e50"),
+            ("Professor Hudson", 14, "#34495e"),
+            ("Desenvolvido por Anderson Henrique e Lurian Letícia", 14, "#34495e")
         ]
         
         for i, (text, size, color) in enumerate(credits_text):
@@ -111,14 +139,14 @@ class RainbowSplashScreen:
         self.loading_text = self.canvas.create_text(center_x, y,
                                                    text="",
                                                    font=("Consolas", 12),
-                                                   fill="#00FF88",
+                                                   fill="#2e7d32",
                                                    state='hidden')
         
         # Cursor piscante
         self.cursor = self.canvas.create_text(center_x + 100, y,
                                             text="█",
                                             font=("Consolas", 12),
-                                            fill="#00FF88",
+                                            fill="#2e7d32",
                                             state='hidden')
     
     def animate(self, callback=None):
@@ -235,7 +263,7 @@ class RainbowSplashScreen:
         tip = self.canvas.create_text(center_x, tip_y,
                                      text="💡 Clique na seção Ajuda para acessar a documentação do compilador.",
                                      font=("Segoe UI", 11, "italic"),
-                                     fill="#FFD700",
+                                     fill="#e65100",
                                      state='normal')
         
         # Criar botão para lançar IDE
@@ -262,7 +290,7 @@ class RainbowSplashScreen:
         
         # Texto do botão
         self.button_text = self.canvas.create_text(center_x, button_y,
-                                                 text="🚀 Lançar Rainbow IDE",
+                                                 text="🚀 Abrir Rainbow IDE",
                                                  font=("Segoe UI", 12, "bold"),
                                                  fill="#FFFFFF")
         
