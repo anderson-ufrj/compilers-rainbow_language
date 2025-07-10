@@ -9,6 +9,7 @@ import json
 import threading
 import time
 from pathlib import Path
+from PIL import Image, ImageTk
 
 class RainbowSplashScreen:
     def __init__(self, canvas, width, height):
@@ -24,20 +25,43 @@ class RainbowSplashScreen:
         self.message_index = 0
         self.animation_done = False
         
-        # Mensagens de carregamento mágicas (completas)
+        # Mensagens de carregamento mágicas com cores diferentes
         self.messages = [
-            "Estabelecendo as cores do arco-íris...",
-            "Convidando o analisador léxico...",
-            "Despertando a gramática...",
-            "Preparando tokens encantados...",
-            "Inicializando a semântica...",
-            "Carregando símbolos místicos...",
-            "Chamando todos os unicórnios disponíveis...",
-            "Pronto para compilar magia."
+            ("Estabelecendo as cores do arco-íris...", "#FF0000"),
+            ("Convidando o analisador léxico...", "#FF7F00"),
+            ("Despertando a gramática...", "#FFFF00"),
+            ("Preparando tokens encantados...", "#00FF00"),
+            ("Inicializando a semântica...", "#0000FF"),
+            ("Carregando símbolos místicos...", "#4B0082"),
+            ("Chamando todos os unicórnios disponíveis...", "#9400D3"),
+            ("Pronto para compilar magia.", "#FF1493")
         ]
         
+    def create_background_image(self):
+        """Carrega e define imagem de fundo"""
+        try:
+            # Caminho para a imagem
+            img_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
+                                  'assets', 'img', 'rainbow.jpg')
+            
+            if os.path.exists(img_path):
+                # Carregar e redimensionar imagem
+                pil_image = Image.open(img_path)
+                pil_image = pil_image.resize((self.width, self.height), Image.Resampling.LANCZOS)
+                self.bg_image = ImageTk.PhotoImage(pil_image)
+                
+                # Criar imagem de fundo no canvas
+                self.canvas.create_image(0, 0, anchor=tk.NW, image=self.bg_image)
+            else:
+                # Fallback para gradiente se imagem não existir
+                self.create_background_gradient()
+        except Exception as e:
+            print(f"Erro ao carregar imagem: {e}")
+            # Fallback para gradiente
+            self.create_background_gradient()
+    
     def create_background_gradient(self):
-        """Cria um fundo gradiente suave e colorido"""
+        """Fallback: Cria um fundo gradiente suave e colorido"""
         # Gradiente vertical com cores suaves do arco-íris
         for i in range(self.height):
             ratio = i / self.height
@@ -81,12 +105,23 @@ class RainbowSplashScreen:
         center_x = self.width // 2
         center_y = self.height // 3 - 30
         
-        # Título Rainbow em uma cor só (azul escuro)
-        self.title = self.canvas.create_text(center_x, center_y, 
-                                           text="RAINBOW", 
-                                           font=("Impact", 48, "bold"),
-                                           fill="#1a237e",
-                                           state='hidden')
+        # Título Rainbow com cada letra em uma cor diferente
+        title_text = "RAINBOW"
+        title_colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']
+        
+        # Criar cada letra com cor diferente
+        self.title_letters = []
+        letter_width = 35  # Largura aproximada de cada letra
+        start_x = center_x - (len(title_text) * letter_width) // 2
+        
+        for i, (letter, color) in enumerate(zip(title_text, title_colors)):
+            x_pos = start_x + (i * letter_width)
+            letter_obj = self.canvas.create_text(x_pos, center_y,
+                                               text=letter,
+                                               font=("Impact", 48, "bold"),
+                                               fill=color,
+                                               state='hidden')
+            self.title_letters.append(letter_obj)
         
         # Arco-íris tradicional (barras coloridas)
         self.create_traditional_rainbow()
@@ -116,9 +151,9 @@ class RainbowSplashScreen:
         base_y = self.height // 3 + 80
         
         credits_text = [
-            ("Projeto de Compiladores – IF Sul de Minas", 16, "#2c3e50"),
-            ("Professor Hudson", 14, "#34495e"),
-            ("Desenvolvido por Anderson Henrique e Lurian Letícia", 14, "#34495e")
+            ("Projeto de Compiladores – IF Sul de Minas", 16, "#FF6B35"),
+            ("Professor Hudson", 14, "#004E89"),
+            ("Desenvolvido por Anderson Henrique e Lurian Letícia", 14, "#9A031E")
         ]
         
         for i, (text, size, color) in enumerate(credits_text):
@@ -153,8 +188,8 @@ class RainbowSplashScreen:
         """Inicia toda a sequência de animação"""
         self.callback = callback
         
-        # 1. Criar fundo gradiente
-        self.create_background_gradient()
+        # 1. Criar fundo com imagem ou gradiente
+        self.create_background_image()
         
         # 2. Criar elementos (ocultos inicialmente)
         self.create_rainbow_logo()
@@ -166,11 +201,17 @@ class RainbowSplashScreen:
     
     def animate_rainbow_appear(self):
         """Animação de aparição do logo Rainbow e arco-íris"""
-        # Mostrar título
-        self.canvas.itemconfig(self.title, state='normal')
+        # Mostrar título (cada letra)
+        self.animate_title_letters(0)
         
         # Animar barras do arco-íris
-        self.animate_rainbow_bars(0)
+        self.canvas.after(800, lambda: self.animate_rainbow_bars(0))
+    
+    def animate_title_letters(self, letter_index):
+        """Anima cada letra do título aparecendo"""
+        if letter_index < len(self.title_letters):
+            self.canvas.itemconfig(self.title_letters[letter_index], state='normal')
+            self.canvas.after(150, lambda: self.animate_title_letters(letter_index + 1))
     
     def animate_rainbow_bars(self, step):
         """Anima as barras do arco-íris expandindo (versão original)"""
@@ -224,24 +265,25 @@ class RainbowSplashScreen:
     def animate_next_message(self):
         """Anima a próxima mensagem de loading"""
         if self.message_index < len(self.messages):
-            message = self.messages[self.message_index]
-            self.type_message(message, 0)
+            message_text, message_color = self.messages[self.message_index]
+            self.type_message(message_text, message_color, 0)
         else:
             # Todas as mensagens foram exibidas, mostrar dica final
             self.canvas.after(1000, self.show_final_tip)
     
-    def type_message(self, message, char_index):
+    def type_message(self, message, color, char_index):
         """Efeito de digitação para as mensagens"""
         if char_index <= len(message):
             current_text = message[:char_index]
             if char_index < len(message):
                 current_text += "█"  # Cursor
             
-            self.canvas.itemconfig(self.loading_text, text=current_text)
+            # Atualizar cor e texto
+            self.canvas.itemconfig(self.loading_text, text=current_text, fill=color)
             
             # Continuar digitando
             if char_index < len(message):
-                self.canvas.after(25, lambda: self.type_message(message, char_index + 1))
+                self.canvas.after(25, lambda: self.type_message(message, color, char_index + 1))
             else:
                 # Mensagem completa, aguardar e próxima
                 self.message_index += 1
@@ -260,7 +302,7 @@ class RainbowSplashScreen:
         tip = self.canvas.create_text(center_x, tip_y,
                                      text="💡 Clique na seção Ajuda para acessar a documentação do compilador.",
                                      font=("Segoe UI", 11, "italic"),
-                                     fill="#e65100",
+                                     fill="#FFD700",
                                      state='normal')
         
         # Aguardar um pouco e fechar automaticamente
@@ -332,6 +374,7 @@ class RainbowIDE:
         # Variáveis
         self.current_file = None
         self.modified = False
+        self.ui_initialized = False
         
         # Configurar estilo macOS/Linux
         self.setup_native_style()
@@ -402,6 +445,11 @@ class RainbowIDE:
         self.setup_ui()
         
     def setup_ui(self):
+        # Prevenir inicialização múltipla
+        if self.ui_initialized:
+            return
+        self.ui_initialized = True
+        
         # Configurar estilo
         self.setup_styles()
         
@@ -622,12 +670,12 @@ class RainbowIDE:
         
     def create_main_panel(self):
         # Painel principal com divisão
-        main_paned = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
-        main_paned.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.main_paned = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
+        self.main_paned.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
         # Painel esquerdo - Editor
-        left_frame = tk.Frame(main_paned, bg=self.bg_color)
-        main_paned.add(left_frame, weight=2)
+        left_frame = tk.Frame(self.main_paned, bg=self.bg_color)
+        self.main_paned.add(left_frame, weight=2)
         
         # Números de linha e editor de texto
         text_frame = tk.Frame(left_frame, bg=self.bg_color)
@@ -670,8 +718,8 @@ class RainbowIDE:
         self.text_editor.bind("<ButtonRelease-1>", self.update_cursor_position)
         
         # Painel direito - Resultados
-        right_frame = tk.Frame(main_paned, bg=self.bg_color)
-        main_paned.add(right_frame, weight=1)
+        right_frame = tk.Frame(self.main_paned, bg=self.bg_color)
+        self.main_paned.add(right_frame, weight=1)
         
         # Notebook para diferentes saídas
         self.notebook = ttk.Notebook(right_frame, style="Dark.TNotebook")
