@@ -42,7 +42,7 @@ O Compilador Rainbow é um projeto acadêmico que implementa as fases de compila
 
 1. Clone o repositório:
 ```bash
-git clone [url-do-repositorio]
+git clone https://github.com/anderson-ufrj/compilers-rainbow_language
 cd compilers-rainbow_language
 ```
 
