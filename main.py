@@ -967,23 +967,29 @@ class RainbowIDE:
         canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
         
-        # Text widget para exibir markdown
+        # Text widget para exibir markdown formatado
         text_widget = tk.Text(scrollable_frame, 
                              bg=self.text_bg, 
                              fg=self.text_fg,
-                             font=("Consolas", 10),
+                             font=("Segoe UI", 11),
                              wrap=tk.WORD,
-                             padx=15,
-                             pady=15,
+                             padx=20,
+                             pady=20,
                              height=35,
-                             width=100)
+                             width=100,
+                             spacing1=2,
+                             spacing2=1,
+                             spacing3=2)
         text_widget.pack(fill=tk.BOTH, expand=True)
         
-        # Ler e exibir conteúdo markdown
+        # Configurar tags para formatação markdown
+        self._configure_markdown_tags(text_widget)
+        
+        # Ler e formatar conteúdo markdown
         try:
             with open(doc_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-                text_widget.insert(tk.END, content)
+                self._render_markdown(text_widget, content)
                 text_widget.config(state=tk.DISABLED)  # Somente leitura
         except Exception as e:
             text_widget.insert(tk.END, f"Erro ao carregar documentação: {str(e)}")
@@ -1034,6 +1040,178 @@ class RainbowIDE:
         canvas.bind("<MouseWheel>", on_mousewheel)  # Windows
         canvas.bind("<Button-4>", lambda e: canvas.yview_scroll(-1, "units"))  # Linux
         canvas.bind("<Button-5>", lambda e: canvas.yview_scroll(1, "units"))   # Linux
+    
+    def _configure_markdown_tags(self, text_widget):
+        """Configurar tags para formatação de markdown"""
+        # Cores baseadas no tema atual
+        heading_color = "#4CAF50" if self.current_theme == "dark" else "#2E7D32"
+        code_bg = "#2d2d2d" if self.current_theme == "dark" else "#f5f5f5"
+        code_fg = "#ff6b6b" if self.current_theme == "dark" else "#d32f2f"
+        bold_color = "#81C784" if self.current_theme == "dark" else "#1B5E20"
+        link_color = "#64B5F6" if self.current_theme == "dark" else "#1976D2"
+        
+        # Títulos (H1-H6)
+        text_widget.tag_configure("h1", font=("Segoe UI", 20, "bold"), 
+                                 foreground=heading_color, spacing1=10, spacing3=5)
+        text_widget.tag_configure("h2", font=("Segoe UI", 18, "bold"), 
+                                 foreground=heading_color, spacing1=8, spacing3=4)
+        text_widget.tag_configure("h3", font=("Segoe UI", 16, "bold"), 
+                                 foreground=heading_color, spacing1=6, spacing3=3)
+        text_widget.tag_configure("h4", font=("Segoe UI", 14, "bold"), 
+                                 foreground=heading_color, spacing1=4, spacing3=2)
+        text_widget.tag_configure("h5", font=("Segoe UI", 12, "bold"), 
+                                 foreground=heading_color, spacing1=3, spacing3=2)
+        text_widget.tag_configure("h6", font=("Segoe UI", 11, "bold"), 
+                                 foreground=heading_color, spacing1=2, spacing3=1)
+        
+        # Texto em negrito
+        text_widget.tag_configure("bold", font=("Segoe UI", 11, "bold"), 
+                                 foreground=bold_color)
+        
+        # Texto em itálico
+        text_widget.tag_configure("italic", font=("Segoe UI", 11, "italic"))
+        
+        # Código inline
+        text_widget.tag_configure("code", font=("Consolas", 10), 
+                                 background=code_bg, foreground=code_fg)
+        
+        # Blocos de código
+        text_widget.tag_configure("codeblock", font=("Consolas", 10), 
+                                 background=code_bg, foreground=code_fg,
+                                 lmargin1=20, lmargin2=20, spacing1=5, spacing3=5)
+        
+        # Links
+        text_widget.tag_configure("link", foreground=link_color, underline=True)
+        
+        # Listas
+        text_widget.tag_configure("list", lmargin1=20, lmargin2=30)
+        
+        # Citações
+        text_widget.tag_configure("quote", lmargin1=20, lmargin2=20, 
+                                 background=code_bg, spacing1=3, spacing3=3)
+        
+        # Linha horizontal
+        text_widget.tag_configure("hr", font=("Segoe UI", 1), spacing1=10, spacing3=10)
+        
+        # Tabelas
+        text_widget.tag_configure("table", font=("Consolas", 10), 
+                                 background=code_bg, spacing1=2)
+    
+    def _render_markdown(self, text_widget, content):
+        """Renderizar markdown com formatação"""
+        import re
+        
+        lines = content.split('\n')
+        in_code_block = False
+        code_lang = ""
+        
+        for line in lines:
+            original_line = line
+            
+            # Detectar início/fim de bloco de código
+            if line.strip().startswith('```'):
+                in_code_block = not in_code_block
+                if in_code_block:
+                    code_lang = line.strip()[3:].strip()
+                continue
+            
+            # Se estamos em um bloco de código
+            if in_code_block:
+                text_widget.insert(tk.END, line + '\n', 'codeblock')
+                continue
+            
+            # Títulos (H1-H6)
+            if line.startswith('#'):
+                level = 0
+                for char in line:
+                    if char == '#':
+                        level += 1
+                    else:
+                        break
+                
+                if 1 <= level <= 6:
+                    title_text = line[level:].strip()
+                    tag = f"h{level}"
+                    text_widget.insert(tk.END, title_text + '\n\n', tag)
+                    continue
+            
+            # Linha horizontal
+            if line.strip() in ['---', '***', '___']:
+                text_widget.insert(tk.END, '─' * 50 + '\n\n', 'hr')
+                continue
+            
+            # Lista com marcadores
+            if re.match(r'^[\s]*[-*+]\s', line):
+                indent = len(line) - len(line.lstrip())
+                bullet = '•' if self.current_theme == 'dark' else '●'
+                list_text = f"{' ' * indent}{bullet} {line.strip()[1:].strip()}\n"
+                text_widget.insert(tk.END, list_text, 'list')
+                continue
+            
+            # Lista numerada
+            if re.match(r'^[\s]*\d+\.\s', line):
+                text_widget.insert(tk.END, line + '\n', 'list')
+                continue
+            
+            # Citação
+            if line.strip().startswith('>'):
+                quote_text = line.strip()[1:].strip()
+                text_widget.insert(tk.END, f"│ {quote_text}\n", 'quote')
+                continue
+            
+            # Processar formatação inline na linha
+            if line.strip():
+                self._process_inline_formatting(text_widget, line)
+            else:
+                text_widget.insert(tk.END, '\n')
+    
+    def _process_inline_formatting(self, text_widget, line):
+        """Processar formatação inline (negrito, itálico, código, links)"""
+        import re
+        
+        # Padrões regex para formatação
+        patterns = [
+            (r'`([^`]+)`', 'code'),  # Código inline
+            (r'\*\*([^*]+)\*\*', 'bold'),  # Negrito
+            (r'\*([^*]+)\*', 'italic'),  # Itálico
+            (r'\[([^\]]+)\]\([^)]+\)', 'link'),  # Links
+        ]
+        
+        pos = 0
+        
+        while pos < len(line):
+            # Encontrar a próxima formatação
+            next_match = None
+            next_tag = None
+            
+            for pattern, tag in patterns:
+                match = re.search(pattern, line[pos:])
+                if match and (next_match is None or match.start() < next_match.start()):
+                    next_match = match
+                    next_tag = tag
+            
+            if next_match:
+                # Inserir texto antes da formatação
+                if next_match.start() > 0:
+                    text_widget.insert(tk.END, line[pos:pos + next_match.start()])
+                
+                # Inserir texto formatado
+                if next_tag == 'link':
+                    # Para links, extrair apenas o texto
+                    link_match = re.match(r'\[([^\]]+)\]', next_match.group(0))
+                    if link_match:
+                        text_widget.insert(tk.END, link_match.group(1), next_tag)
+                else:
+                    # Para outros, usar o grupo capturado
+                    text_widget.insert(tk.END, next_match.group(1), next_tag)
+                
+                pos += next_match.end()
+            else:
+                # Não há mais formatação, inserir o resto da linha
+                text_widget.insert(tk.END, line[pos:])
+                break
+        
+        text_widget.insert(tk.END, '\n')
         
     def show_about(self):
         about_window = tk.Toplevel(self.root)
