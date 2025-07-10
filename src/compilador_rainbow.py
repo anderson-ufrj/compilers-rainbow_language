@@ -9,6 +9,7 @@ import os
 from datetime import datetime
 from analisador_lexico import AnalisadorLexico, TokenType
 from analisador_sintatico import AnalisadorSintatico
+from analisador_semantico import AnalisadorSemantico
 
 
 class CompiladorRainbow:
@@ -17,10 +18,13 @@ class CompiladorRainbow:
     def __init__(self):
         self.analisador_lexico = AnalisadorLexico()
         self.analisador_sintatico = AnalisadorSintatico()
+        self.analisador_semantico = AnalisadorSemantico()
         self.tokens = []
         self.erros_lexicos = []
         self.ast = None
         self.erros_sintaticos = []
+        self.erros_semanticos = []
+        self.avisos_semanticos = []
     
     def compilar_arquivo(self, caminho_arquivo: str) -> bool:
         """
@@ -69,11 +73,32 @@ class CompiladorRainbow:
         else:
             print("✅ Análise sintática concluída sem erros")
         
+        # Fase 3: Análise Semântica
+        print("\n🧠 Fase 3: Análise Semântica")
+        print("-" * 40)
+        
+        if self.ast:
+            self.erros_semanticos, self.avisos_semanticos = self.analisador_semantico.analisar(self.ast)
+            
+            if self.erros_semanticos:
+                print(f"❌ {len(self.erros_semanticos)} erro(s) semântico(s) encontrado(s):")
+                for erro in self.erros_semanticos:
+                    print(f"   {erro}")
+            else:
+                print("✅ Análise semântica concluída sem erros")
+            
+            if self.avisos_semanticos:
+                print(f"⚠️  {len(self.avisos_semanticos)} aviso(s) semântico(s):")
+                for aviso in self.avisos_semanticos:
+                    print(f"   {aviso}")
+        else:
+            print("⚠️  Análise semântica pulada devido a erros sintáticos")
+        
         # Gerar arquivos de saída
         self._gerar_arquivos_saida(caminho_arquivo)
         
         # Resumo final
-        total_erros = len(self.erros_lexicos) + len(self.erros_sintaticos)
+        total_erros = len(self.erros_lexicos) + len(self.erros_sintaticos) + len(self.erros_semanticos)
         
         print("\n" + "=" * 80)
         print("📋 RESUMO DA COMPILAÇÃO")
@@ -82,6 +107,8 @@ class CompiladorRainbow:
         print(f"Tokens gerados: {len(self.tokens) - 1}")
         print(f"Erros léxicos: {len(self.erros_lexicos)}")
         print(f"Erros sintáticos: {len(self.erros_sintaticos)}")
+        print(f"Erros semânticos: {len(self.erros_semanticos)}")
+        print(f"Avisos: {len(self.avisos_semanticos)}")
         print(f"Total de erros: {total_erros}")
         
         if total_erros == 0:
@@ -126,6 +153,23 @@ class CompiladorRainbow:
         syntax_errors_file = base_name + '.syntax.errors'
         self._gerar_relatorio_erros_sintaticos(syntax_errors_file)
         print(f"   ✅ {syntax_errors_file}")
+        
+        # Arquivos semânticos (se houver AST)
+        if self.ast:
+            # Arquivo .simbolos (tabela de símbolos)
+            simbolos_file = base_name + '.simbolos'
+            self.analisador_semantico.gerar_relatorio_simbolos(simbolos_file)
+            print(f"   ✅ {simbolos_file}")
+            
+            # Arquivo .semantic.errors (erros semânticos)
+            semantic_errors_file = base_name + '.semantic.errors'
+            self.analisador_semantico.gerar_relatorio_erros_semanticos(semantic_errors_file)
+            print(f"   ✅ {semantic_errors_file}")
+            
+            # Arquivo .semantic.json (análise semântica em JSON)
+            semantic_json_file = base_name + '.semantic.json'
+            self.analisador_semantico.exportar_json(semantic_json_file)
+            print(f"   ✅ {semantic_json_file}")
     
     def _gerar_analise_completa_json(self, arquivo_saida: str):
         """Gera arquivo JSON com análise completa"""
@@ -154,10 +198,18 @@ class CompiladorRainbow:
                 'erros': self.erros_sintaticos,
                 'sucesso': len(self.erros_sintaticos) == 0
             },
+            'analise_semantica': {
+                'simbolos': [simbolo.to_dict() for simbolo in self.analisador_semantico.tabela_simbolos.obter_todos_simbolos()] if self.ast else [],
+                'erros': self.erros_semanticos,
+                'avisos': self.avisos_semanticos,
+                'sucesso': len(self.erros_semanticos) == 0
+            },
             'resumo': {
                 'total_erros_lexicos': len(self.erros_lexicos),
                 'total_erros_sintaticos': len(self.erros_sintaticos),
-                'compilacao_bem_sucedida': len(self.erros_lexicos) + len(self.erros_sintaticos) == 0
+                'total_erros_semanticos': len(self.erros_semanticos),
+                'total_avisos': len(self.avisos_semanticos),
+                'compilacao_bem_sucedida': len(self.erros_lexicos) + len(self.erros_sintaticos) + len(self.erros_semanticos) == 0
             }
         }
         
