@@ -238,6 +238,16 @@ class RainbowIDE:
         run_menu.add_command(label="Análise Semântica", command=self.run_semantic, accelerator="F7")
         run_menu.add_command(label="Compilação Completa", command=self.run_full, accelerator="F8")
         
+        # Menu Exemplos
+        examples_menu = tk.Menu(menubar, tearoff=0, bg=self.button_bg, fg=self.text_fg)
+        menubar.add_cascade(label="Exemplos", menu=examples_menu)
+        examples_menu.add_command(label="👋 Olá Mundo", command=lambda: self.open_example("ola_mundo.rainbow"))
+        examples_menu.add_command(label="🧮 Calculadora", command=lambda: self.open_example("calculadora.rainbow"))
+        examples_menu.add_command(label="📊 Tabuada", command=lambda: self.open_example("tabuada.rainbow"))
+        examples_menu.add_command(label="🔀 Condicional", command=lambda: self.open_example("condicional.rainbow"))
+        examples_menu.add_command(label="🔄 Laço Para", command=lambda: self.open_example("laco_para.rainbow"))
+        examples_menu.add_command(label="🏷️ Tipos de Dados", command=lambda: self.open_example("tipos_dados.rainbow"))
+        
         # Menu Visualizar
         view_menu = tk.Menu(menubar, tearoff=0, bg=self.button_bg, fg=self.text_fg)
         menubar.add_cascade(label="Visualizar", menu=view_menu)
@@ -636,6 +646,19 @@ class RainbowIDE:
             filetypes=[("Rainbow files", "*.rainbow"), ("All files", "*.*")]
         )
         if filename:
+            self.load_file(filename)
+            
+    def open_example(self, example_name):
+        examples_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "exemplos")
+        filename = os.path.join(examples_dir, example_name)
+        
+        if os.path.exists(filename):
+            self.load_file(filename)
+        else:
+            messagebox.showerror("Erro", f"Exemplo '{example_name}' não encontrado!")
+            
+    def load_file(self, filename):
+        try:
             with open(filename, 'r', encoding='utf-8') as file:
                 content = file.read()
             self.text_editor.delete("1.0", "end")
@@ -646,6 +669,9 @@ class RainbowIDE:
             self.update_line_numbers()
             self.apply_syntax_highlighting()
             self.clear_outputs()
+            self.status_bar.config(text=f"Arquivo carregado: {os.path.basename(filename)}")
+        except Exception as e:
+            messagebox.showerror("Erro", f"Não foi possível abrir o arquivo:\n{str(e)}")
             
     def save_file(self):
         if self.current_file:
