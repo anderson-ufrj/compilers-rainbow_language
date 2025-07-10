@@ -865,14 +865,244 @@ class RainbowIDE:
         if self.modified:
             self.save_file()
             
-        # Limpar console
-        self.console_text.delete("1.0", "end")
-        self.notebook.select(self.console_frame)
+        # Abrir executor visual
+        self.open_visual_executor()
+    
+    def open_visual_executor(self):
+        """Abre o executor visual"""
+        executor_window = tk.Toplevel(self.root)
+        executor_window.title("🚀 Executor Rainbow")
+        executor_window.geometry("700x500")
+        executor_window.configure(bg=self.bg_color)
         
-        # Executar em thread separada
-        thread = threading.Thread(target=self._run_program_thread)
+        # Centralizar janela
+        executor_window.transient(self.root)
+        
+        x = (executor_window.winfo_screenwidth() - 700) // 2
+        y = (executor_window.winfo_screenheight() - 500) // 2
+        executor_window.geometry(f"700x500+{x}+{y}")
+        
+        # Frame principal
+        main_frame = tk.Frame(executor_window, bg=self.bg_color)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Título
+        title_label = tk.Label(main_frame, text="🌈 Executando Programa Rainbow", 
+                              font=("Arial", 16, "bold"), 
+                              bg=self.bg_color, fg=self.text_fg)
+        title_label.pack(pady=(0, 10))
+        
+        # Frame para saída
+        output_frame = tk.Frame(main_frame, bg=self.bg_color)
+        output_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Console de saída
+        output_text = tk.Text(output_frame, 
+                             bg=self.text_bg, 
+                             fg=self.text_fg,
+                             font=("Consolas", 11),
+                             wrap=tk.WORD,
+                             padx=10,
+                             pady=10)
+        
+        scrollbar = tk.Scrollbar(output_frame, orient="vertical", command=output_text.yview)
+        output_text.configure(yscrollcommand=scrollbar.set)
+        
+        output_text.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Frame para entrada
+        input_frame = tk.Frame(main_frame, bg=self.bg_color)
+        input_frame.pack(fill=tk.X, pady=(10, 0))
+        
+        # Campo de entrada (inicialmente oculto)
+        input_label = tk.Label(input_frame, text="", 
+                              bg=self.bg_color, fg=self.text_fg,
+                              font=("Arial", 10))
+        
+        input_entry = tk.Entry(input_frame, 
+                              bg=self.text_bg, fg=self.text_fg,
+                              font=("Arial", 11),
+                              insertbackground=self.text_fg)
+        
+        input_button = tk.Button(input_frame, text="Enviar",
+                                bg=self.button_bg, fg=self.text_fg,
+                                font=("Arial", 10))
+        
+        # Inicialmente ocultos
+        input_label.pack_forget()
+        input_entry.pack_forget()
+        input_button.pack_forget()
+        
+        # Frame para botões
+        button_frame = tk.Frame(main_frame, bg=self.bg_color)
+        button_frame.pack(fill=tk.X, pady=(10, 0))
+        
+        # Botão executar
+        execute_btn = tk.Button(button_frame, text="▶️ Executar",
+                               command=lambda: self._execute_in_visual(output_text, input_label, input_entry, input_button, execute_btn),
+                               bg=self.button_bg, fg=self.text_fg,
+                               font=("Arial", 10, "bold"),
+                               padx=20, pady=5)
+        execute_btn.pack(side=tk.LEFT)
+        
+        # Botão limpar
+        clear_btn = tk.Button(button_frame, text="🗑️ Limpar",
+                             command=lambda: output_text.delete("1.0", "end"),
+                             bg=self.button_bg, fg=self.text_fg,
+                             font=("Arial", 10),
+                             padx=20, pady=5)
+        clear_btn.pack(side=tk.LEFT, padx=(5, 0))
+        
+        # Botão fechar
+        close_btn = tk.Button(button_frame, text="❌ Fechar",
+                             command=executor_window.destroy,
+                             bg=self.button_bg, fg=self.text_fg,
+                             font=("Arial", 10),
+                             padx=20, pady=5)
+        close_btn.pack(side=tk.RIGHT)
+        
+        # Salvar referências para o callback
+        self.executor_widgets = {
+            'window': executor_window,
+            'output': output_text,
+            'input_label': input_label,
+            'input_entry': input_entry,
+            'input_button': input_button,
+            'input_frame': input_frame,
+            'pending_input': None,
+            'input_event': None
+        }
+    
+    def _execute_in_visual(self, output_text, input_label, input_entry, input_button, execute_btn):
+        """Executa programa no executor visual"""
+        # Desabilitar botão de executar
+        execute_btn.config(state=tk.DISABLED, text="⏳ Executando...")
+        
+        # Limpar saída
+        output_text.delete("1.0", "end")
+        output_text.insert("end", "🌈 Iniciando execução...\n\n")
+        output_text.update()
+        
+        # Configurar entrada visual
+        def handle_input():
+            valor = input_entry.get()
+            input_entry.delete(0, tk.END)
+            
+            # Ocultar campos de entrada
+            input_label.pack_forget()
+            input_entry.pack_forget()
+            input_button.pack_forget()
+            
+            # Mostrar valor na saída
+            output_text.insert("end", f"➤ {valor}\n")
+            output_text.see("end")
+            output_text.update()
+            
+            # Sinalizar que a entrada foi recebida
+            if self.executor_widgets['input_event']:
+                self.executor_widgets['pending_input'] = valor
+                self.executor_widgets['input_event'].set()
+        
+        def on_enter(event):
+            handle_input()
+        
+        input_button.config(command=handle_input)
+        input_entry.bind('<Return>', on_enter)
+        
+        # Executar em thread
+        thread = threading.Thread(target=self._execute_visual_thread, 
+                                 args=(output_text, input_label, input_entry, input_button, execute_btn))
         thread.daemon = True
         thread.start()
+    
+    def _execute_visual_thread(self, output_text, input_label, input_entry, input_button, execute_btn):
+        """Thread para executar no executor visual"""
+        try:
+            # Importar interpretador
+            sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
+            from interpretador_rainbow import InterpretadorRainbow
+            
+            # Criar interpretador com callback visual
+            interpretador = InterpretadorRainbow(ide_callback=self.solicitar_entrada_visual)
+            
+            # Executar
+            sucesso, resultado = interpretador.executar_arquivo(self.current_file)
+            
+            # Atualizar interface na thread principal
+            def update_ui():
+                if sucesso:
+                    output_text.insert("end", f"\n{resultado}\n")
+                    output_text.insert("end", "\n✅ Programa executado com sucesso!\n")
+                else:
+                    output_text.insert("end", f"\n❌ Erro: {resultado}\n")
+                    # Destacar linha com erro no editor principal
+                    self.highlight_error_line(resultado)
+                
+                output_text.see("end")
+                execute_btn.config(state=tk.NORMAL, text="▶️ Executar")
+            
+            self.root.after(0, update_ui)
+            
+        except Exception as e:
+            def show_error():
+                output_text.insert("end", f"\n❌ Erro: {str(e)}\n")
+                self.highlight_error_line(str(e))
+                output_text.see("end")
+                execute_btn.config(state=tk.NORMAL, text="▶️ Executar")
+            
+            self.root.after(0, show_error)
+    
+    def solicitar_entrada_visual(self, prompt):
+        """Solicita entrada no executor visual"""
+        resultado = [None]
+        evento = threading.Event()
+        
+        def mostrar_entrada():
+            # Mostrar prompt na saída
+            self.executor_widgets['output'].insert("end", f"\n📝 {prompt}\n")
+            self.executor_widgets['output'].see("end")
+            
+            # Mostrar campos de entrada
+            self.executor_widgets['input_label'].config(text=prompt)
+            self.executor_widgets['input_label'].pack(pady=(5, 0))
+            self.executor_widgets['input_entry'].pack(fill=tk.X, pady=5)
+            self.executor_widgets['input_button'].pack()
+            
+            # Focar no campo de entrada
+            self.executor_widgets['input_entry'].focus_set()
+            
+            # Configurar evento
+            self.executor_widgets['input_event'] = evento
+        
+        self.root.after(0, mostrar_entrada)
+        evento.wait()  # Aguardar entrada
+        
+        return self.executor_widgets['pending_input'] or ""
+    
+    def highlight_error_line(self, error_message):
+        """Destaca linha com erro no editor"""
+        # Extrair número da linha do erro
+        import re
+        match = re.search(r'linha (\d+)', error_message, re.IGNORECASE)
+        if match:
+            linha_erro = int(match.group(1))
+            
+            # Limpar destacamentos anteriores
+            self.text_editor.tag_remove("error_line", "1.0", "end")
+            
+            # Destacar linha com erro
+            self.text_editor.tag_configure("error_line", 
+                                          background="#ff4444" if self.current_theme == "dark" else "#ffcccc",
+                                          font=("Consolas", 10, "italic"))
+            
+            start_pos = f"{linha_erro}.0"
+            end_pos = f"{linha_erro}.end"
+            self.text_editor.tag_add("error_line", start_pos, end_pos)
+            
+            # Ir para a linha do erro
+            self.text_editor.see(start_pos)
+            self.text_editor.mark_set("insert", start_pos)
         
     def _run_program_thread(self):
         """Thread para executar o programa"""

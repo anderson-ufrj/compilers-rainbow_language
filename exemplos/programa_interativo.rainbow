@@ -2,15 +2,14 @@ RAINBOW.
 
 // Programa interativo - solicita dados do usuário
 #nome recebe ler("Digite seu nome: ").
-#idade_texto recebe ler("Digite sua idade: ").
+#idade recebe ler("Digite sua idade: ").
 
 mostrar("").
 mostrar("=== INFORMAÇÕES ===").
 mostrar("Nome: " + #nome).
-mostrar("Idade: " + #idade_texto).
+mostrar("Idade: " + #idade).
 
-// Converter idade para número para comparação
-#idade recebe 18.
+// Verificar se é maior de idade
 se (#idade >= 18) {
     mostrar(#nome + " é maior de idade!").
 } senao {

@@ -301,6 +301,23 @@ class InterpretadorRainbow:
         """Avalia uma expressão"""
         expressao = expressao.strip()
         
+        # Remover parênteses externos se existirem
+        if expressao.startswith('(') and expressao.endswith(')'):
+            # Verificar se os parênteses são balanceados
+            nivel = 0
+            for i, char in enumerate(expressao):
+                if char == '(':
+                    nivel += 1
+                elif char == ')':
+                    nivel -= 1
+                    if nivel == 0 and i < len(expressao) - 1:
+                        # Parênteses não são externos, quebrar
+                        break
+            else:
+                # Parênteses são externos, remover
+                if nivel == 0:
+                    expressao = expressao[1:-1].strip()
+        
         # String literal
         if expressao.startswith('"') and expressao.endswith('"'):
             return expressao[1:-1]
