@@ -152,6 +152,8 @@ class InterpretadorRainbow:
             raise Exception(f"Sintaxe de mostrar inválida: {linha}")
             
         expressao = match.group(1)
+        # Debug
+        # print(f"DEBUG: Avaliando expressão: '{expressao}'")
         valor = self.avaliar_expressao(expressao)
         
         # Converter para string se necessário
@@ -381,31 +383,37 @@ class InterpretadorRainbow:
         for op in ['+', '-', '*', '/', '%']:
             if op in expressao:
                 partes = self.dividir_expressao(expressao, op)
-                if len(partes) == 2:
-                    esq = self.avaliar_expressao(partes[0].strip())
-                    dir = self.avaliar_expressao(partes[1].strip())
+                if len(partes) >= 2:
+                    # Avaliar primeira parte
+                    resultado = self.avaliar_expressao(partes[0].strip())
                     
-                    # Para soma, verificar se é concatenação de string
-                    if op == '+':
-                        # Se algum operando é string ou contém string, fazer concatenação
-                        if isinstance(esq, str) or isinstance(dir, str):
-                            return str(esq) + str(dir)
+                    # Avaliar e combinar com as partes restantes
+                    for i in range(1, len(partes)):
+                        dir = self.avaliar_expressao(partes[i].strip())
+                        
+                        # Para soma, verificar se é concatenação de string
+                        if op == '+':
+                            # Se algum operando é string ou contém string, fazer concatenação
+                            if isinstance(resultado, str) or isinstance(dir, str):
+                                resultado = str(resultado) + str(dir)
+                            else:
+                                resultado = resultado + dir
                         else:
-                            return esq + dir
+                            # Para outras operações, converter para números
+                            try:
+                                if isinstance(resultado, str):
+                                    resultado = float(resultado) if '.' in resultado else int(resultado)
+                                if isinstance(dir, str):
+                                    dir = float(dir) if '.' in dir else int(dir)
+                            except ValueError:
+                                raise Exception(f"Não é possível converter para número: {resultado} ou {dir}")
+                            
+                            if op == '-': resultado = resultado - dir
+                            elif op == '*': resultado = resultado * dir
+                            elif op == '/': resultado = resultado / dir if dir != 0 else 0
+                            elif op == '%': resultado = resultado % dir if dir != 0 else 0
                     
-                    # Para outras operações, converter para números
-                    try:
-                        if isinstance(esq, str):
-                            esq = float(esq) if '.' in esq else int(esq)
-                        if isinstance(dir, str):
-                            dir = float(dir) if '.' in dir else int(dir)
-                    except ValueError:
-                        raise Exception(f"Não é possível converter para número: {esq} ou {dir}")
-                    
-                    if op == '-': return esq - dir
-                    elif op == '*': return esq * dir
-                    elif op == '/': return esq / dir if dir != 0 else 0
-                    elif op == '%': return esq % dir if dir != 0 else 0
+                    return resultado
                     
         # Operações lógicas
         if ' E ' in expressao:
