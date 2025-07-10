@@ -1,0 +1,36 @@
+RAINBOW.
+
+// Teste de todos os operadores
+#a recebe 10.
+#b recebe 5.
+
+// Operadores matemáticos
+#soma recebe #a + #b.
+#sub recebe #a - #b.
+#mult recebe #a * #b.
+#div recebe #a / #b.
+#mod recebe #a % #b.
+
+// Operadores relacionais
+se (#a > #b) {
+    mostrar("a maior que b").
+}
+
+se (#a igual #b) {
+    mostrar("a igual a b").
+}
+
+// Operadores lógicos
+#x recebe Verdadeiro.
+#y recebe Falso.
+
+se (#x E #y) {
+    mostrar("ambos verdadeiros").
+}
+
+// Laço while
+#contador recebe 0.
+enquanto (#contador < 3) {
+    mostrar("Contando: " + #contador).
+    #contador recebe #contador + 1.
+}

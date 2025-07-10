@@ -233,6 +233,8 @@ class RainbowIDE:
         # Menu Executar
         run_menu = tk.Menu(menubar, tearoff=0, bg=self.button_bg, fg=self.text_fg)
         menubar.add_cascade(label="Executar", menu=run_menu)
+        run_menu.add_command(label="▶️ Executar Programa", command=self.run_program, accelerator="Ctrl+R")
+        run_menu.add_separator()
         run_menu.add_command(label="Análise Léxica", command=self.run_lexical, accelerator="F5")
         run_menu.add_command(label="Análise Sintática", command=self.run_syntactic, accelerator="F6")
         run_menu.add_command(label="Análise Semântica", command=self.run_semantic, accelerator="F7")
@@ -247,6 +249,8 @@ class RainbowIDE:
         examples_menu.add_command(label="🔀 Condicional", command=lambda: self.open_example("condicional.rainbow"))
         examples_menu.add_command(label="🔄 Laço Para", command=lambda: self.open_example("laco_para.rainbow"))
         examples_menu.add_command(label="🏷️ Tipos de Dados", command=lambda: self.open_example("tipos_dados.rainbow"))
+        examples_menu.add_separator()
+        examples_menu.add_command(label="💬 Programa Interativo", command=lambda: self.open_example("programa_interativo.rainbow"))
         
         # Menu Visualizar
         view_menu = tk.Menu(menubar, tearoff=0, bg=self.button_bg, fg=self.text_fg)
@@ -332,7 +336,8 @@ class RainbowIDE:
             ("📂", self.open_file, "Abrir arquivo"),
             ("💾", self.save_file, "Salvar"),
             ("|", None, None),  # Separador
-            ("▶️", self.run_full, "Compilar"),
+            ("▶️", self.run_program, "Executar Programa"),
+            ("🔧", self.run_full, "Compilar"),
             ("🔤", self.run_lexical, "Análise Léxica"),
             ("🌳", self.run_syntactic, "Análise Sintática"),
             ("✅", self.run_semantic, "Análise Semântica"),
@@ -517,6 +522,7 @@ class RainbowIDE:
         self.root.bind('<Control-o>', lambda e: self.open_file())
         self.root.bind('<Control-s>', lambda e: self.save_file())
         self.root.bind('<Control-q>', lambda e: self.quit_app())
+        self.root.bind('<Control-r>', lambda e: self.run_program())
         self.root.bind('<F5>', lambda e: self.run_lexical())
         self.root.bind('<F6>', lambda e: self.run_syntactic())
         self.root.bind('<F7>', lambda e: self.run_semantic())
@@ -835,6 +841,78 @@ class RainbowIDE:
         
     def run_full(self):
         self.run_analysis("src/compilador_rainbow.py", "Compilação Completa")
+        
+    def run_program(self):
+        """Executa o programa Rainbow"""
+        if not self.current_file:
+            messagebox.showwarning("Aviso", "Salve o arquivo antes de executar!")
+            return
+            
+        if self.modified:
+            self.save_file()
+            
+        # Limpar console
+        self.console_text.delete("1.0", "end")
+        self.notebook.select(self.console_frame)
+        
+        # Executar em thread separada
+        thread = threading.Thread(target=self._run_program_thread)
+        thread.daemon = True
+        thread.start()
+        
+    def _run_program_thread(self):
+        """Thread para executar o programa"""
+        try:
+            self.status_bar.config(text="Executando programa...")
+            self.console_text.insert("end", "🌈 Executando programa Rainbow...\n\n")
+            
+            # Importar interpretador
+            sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
+            from interpretador_rainbow import InterpretadorRainbow
+            
+            # Criar interpretador com callback para entrada
+            interpretador = InterpretadorRainbow(ide_callback=self.solicitar_entrada_usuario)
+            
+            # Executar
+            sucesso, resultado = interpretador.executar_arquivo(self.current_file)
+            
+            if sucesso:
+                self.console_text.insert("end", resultado + "\n\n")
+                self.console_text.insert("end", "✅ Programa executado com sucesso!\n")
+                self.status_bar.config(text="Programa executado com sucesso!")
+            else:
+                self.console_text.insert("end", f"❌ Erro: {resultado}\n")
+                self.status_bar.config(text="Erro na execução")
+                
+        except Exception as e:
+            self.console_text.insert("end", f"❌ Erro: {str(e)}\n")
+            self.status_bar.config(text="Erro na execução")
+            
+    def solicitar_entrada_usuario(self, prompt):
+        """Solicita entrada do usuário via dialog"""
+        # Esta função será chamada da thread do interpretador
+        # Precisamos usar after() para executar na thread principal
+        resultado = [None]
+        evento = threading.Event()
+        
+        def pedir_entrada():
+            try:
+                valor = tk.simpledialog.askstring("Entrada", prompt, parent=self.root)
+                if valor is None:
+                    valor = ""
+                resultado[0] = valor
+            except:
+                resultado[0] = ""
+            finally:
+                evento.set()
+                
+        self.root.after(0, pedir_entrada)
+        evento.wait()  # Aguardar resposta
+        
+        # Mostrar no console
+        self.console_text.insert("end", f"{prompt} {resultado[0]}\n")
+        
+        return resultado[0]
         
     def show_about(self):
         about_window = tk.Toplevel(self.root)

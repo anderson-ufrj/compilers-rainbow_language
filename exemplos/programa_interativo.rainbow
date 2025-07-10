@@ -1,0 +1,24 @@
+RAINBOW.
+
+// Programa interativo - solicita dados do usuário
+#nome recebe ler("Digite seu nome: ").
+#idade recebe ler("Digite sua idade: ").
+
+mostrar("").
+mostrar("=== INFORMAÇÕES ===").
+mostrar("Nome: " + #nome).
+mostrar("Idade: " + #idade).
+
+// Converter idade para número para comparação
+#idade_num recebe #idade.
+
+se (#idade_num >= 18) {
+    mostrar(#nome + " é maior de idade!").
+} senao {
+    mostrar(#nome + " é menor de idade!").
+}
+
+// Calcular ano de nascimento aproximado
+#ano_atual recebe 2025.
+#ano_nascimento recebe #ano_atual - #idade_num.
+mostrar("Você nasceu aproximadamente em: " + #ano_nascimento).
