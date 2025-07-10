@@ -60,24 +60,22 @@ class RainbowSplashScreen:
         self.create_traditional_rainbow()
     
     def create_traditional_rainbow(self):
-        """Cria o arco-íris tradicional com barras"""
-        # Posição do arco-íris
+        """Cria o arco-íris tradicional como na versão original"""
+        # Posição do arco-íris (menor que antes)
         rainbow_y = self.height // 3 + 20
         rainbow_width = 400
-        rainbow_height = 40
+        rainbow_height = 30
         start_x = (self.width - rainbow_width) // 2
         
-        bar_width = rainbow_width // len(self.colors)
+        bar_height = rainbow_height / len(self.colors)
         
         for i, color in enumerate(self.colors):
-            x1 = start_x + (i * bar_width)
-            x2 = x1 + bar_width
-            y1 = rainbow_y
-            y2 = rainbow_y + rainbow_height
+            y1 = rainbow_y + (i * bar_height)
+            y2 = y1 + bar_height
             
-            bar = self.canvas.create_rectangle(x1, y1, x1, y2, 
-                                             fill=color, outline=color,
-                                             state='hidden')
+            # Criar barras horizontais (como na versão original)
+            bar = self.canvas.create_rectangle(start_x, y1, start_x, y2, 
+                                             fill=color, outline=color)
             self.bars.append(bar)
     
     def create_credits(self):
@@ -143,24 +141,18 @@ class RainbowSplashScreen:
         self.animate_rainbow_bars(0)
     
     def animate_rainbow_bars(self, step):
-        """Anima as barras do arco-íris expandindo"""
+        """Anima as barras do arco-íris expandindo (versão original)"""
         if step <= 100:
-            for i, bar in enumerate(self.bars):
-                # Mostrar barra
-                self.canvas.itemconfig(bar, state='normal')
-                
-                # Expandir barra
+            rainbow_width = 400
+            start_x = (self.width - rainbow_width) // 2
+            current_width = (rainbow_width / 100) * step
+            
+            for bar in self.bars:
                 coords = self.canvas.coords(bar)
                 if len(coords) >= 4:
                     x1, y1, x2, y2 = coords
-                    rainbow_width = 400
-                    bar_width = rainbow_width // len(self.colors)
-                    start_x = (self.width - rainbow_width) // 2
-                    
-                    target_x2 = start_x + ((i + 1) * bar_width)
-                    current_width = (target_x2 - x1) * (step / 100)
-                    
-                    self.canvas.coords(bar, x1, y1, x1 + current_width, y2)
+                    # Expandir todas as barras juntas da esquerda para direita
+                    self.canvas.coords(bar, start_x, y1, start_x + current_width, y2)
             
             self.canvas.after(20, lambda: self.animate_rainbow_bars(step + 2))
         else:
@@ -306,10 +298,7 @@ class RainbowIDE:
         # Configurar estilo macOS/Linux
         self.setup_native_style()
         
-        # Configurar interface primeiro
-        self.setup_ui()
-        
-        # Mostrar animação de abertura (sobreposta)
+        # Mostrar animação de abertura
         self.show_splash_screen()
         
     def apply_theme(self, theme_name):
@@ -367,6 +356,7 @@ class RainbowIDE:
         
     def close_splash(self):
         self.splash.destroy()
+        self.setup_ui()
         
     def setup_ui(self):
         # Configurar estilo
