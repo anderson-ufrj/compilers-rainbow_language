@@ -288,6 +288,18 @@ class RainbowIDE:
                           self.errors_text, self.console_text]:
                 widget.config(bg=self.text_bg, fg=self.text_fg)
                 
+            # Atualizar frames das abas
+            for frame in [self.tokens_frame, self.ast_frame, self.symbols_frame,
+                         self.errors_frame, self.console_frame]:
+                frame.config(bg=self.bg_color)
+                
+        # Atualizar frames principais
+        if hasattr(self, 'text_frame'):
+            text_frame = self.text_editor.master
+            text_frame.config(bg=self.bg_color)
+            left_frame = text_frame.master
+            left_frame.config(bg=self.bg_color)
+                
         # Re-aplicar syntax highlighting
         if hasattr(self, 'setup_syntax_highlighting'):
             self.setup_syntax_highlighting()
@@ -361,11 +373,11 @@ class RainbowIDE:
         main_paned.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
         # Painel esquerdo - Editor
-        left_frame = ttk.Frame(main_paned)
+        left_frame = tk.Frame(main_paned, bg=self.bg_color)
         main_paned.add(left_frame, weight=2)
         
         # Números de linha e editor de texto
-        text_frame = ttk.Frame(left_frame)
+        text_frame = tk.Frame(left_frame, bg=self.bg_color)
         text_frame.pack(fill=tk.BOTH, expand=True)
         
         # Números de linha
@@ -405,7 +417,7 @@ class RainbowIDE:
         self.text_editor.bind("<ButtonRelease-1>", self.update_cursor_position)
         
         # Painel direito - Resultados
-        right_frame = ttk.Frame(main_paned)
+        right_frame = tk.Frame(main_paned, bg=self.bg_color)
         main_paned.add(right_frame, weight=1)
         
         # Notebook para diferentes saídas
@@ -417,49 +429,49 @@ class RainbowIDE:
         
     def create_output_tabs(self):
         # Aba Tokens
-        self.tokens_frame = ttk.Frame(self.notebook)
+        self.tokens_frame = tk.Frame(self.notebook, bg=self.bg_color)
         self.notebook.add(self.tokens_frame, text="Tokens")
         
         self.tokens_text = tk.Text(self.tokens_frame, wrap=tk.WORD,
                                   background=self.text_bg, foreground=self.text_fg,
-                                  font=("Consolas", 10))
-        self.tokens_text.pack(fill=tk.BOTH, expand=True)
+                                  font=("Consolas", 10), bd=0, highlightthickness=0)
+        self.tokens_text.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
         
         # Aba AST
-        self.ast_frame = ttk.Frame(self.notebook)
+        self.ast_frame = tk.Frame(self.notebook, bg=self.bg_color)
         self.notebook.add(self.ast_frame, text="AST")
         
         self.ast_text = tk.Text(self.ast_frame, wrap=tk.WORD,
                                background=self.text_bg, foreground=self.text_fg,
-                               font=("Consolas", 10))
-        self.ast_text.pack(fill=tk.BOTH, expand=True)
+                               font=("Consolas", 10), bd=0, highlightthickness=0)
+        self.ast_text.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
         
         # Aba Símbolos
-        self.symbols_frame = ttk.Frame(self.notebook)
+        self.symbols_frame = tk.Frame(self.notebook, bg=self.bg_color)
         self.notebook.add(self.symbols_frame, text="Símbolos")
         
         self.symbols_text = tk.Text(self.symbols_frame, wrap=tk.WORD,
                                    background=self.text_bg, foreground=self.text_fg,
-                                   font=("Consolas", 10))
-        self.symbols_text.pack(fill=tk.BOTH, expand=True)
+                                   font=("Consolas", 10), bd=0, highlightthickness=0)
+        self.symbols_text.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
         
         # Aba Erros
-        self.errors_frame = ttk.Frame(self.notebook)
+        self.errors_frame = tk.Frame(self.notebook, bg=self.bg_color)
         self.notebook.add(self.errors_frame, text="Erros")
         
         self.errors_text = tk.Text(self.errors_frame, wrap=tk.WORD,
                                   background=self.text_bg, foreground=self.text_fg,
-                                  font=("Consolas", 10))
-        self.errors_text.pack(fill=tk.BOTH, expand=True)
+                                  font=("Consolas", 10), bd=0, highlightthickness=0)
+        self.errors_text.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
         
         # Aba Console
-        self.console_frame = ttk.Frame(self.notebook)
+        self.console_frame = tk.Frame(self.notebook, bg=self.bg_color)
         self.notebook.add(self.console_frame, text="Console")
         
         self.console_text = tk.Text(self.console_frame, wrap=tk.WORD,
                                    background=self.text_bg, foreground=self.text_fg,
-                                   font=("Consolas", 10))
-        self.console_text.pack(fill=tk.BOTH, expand=True)
+                                   font=("Consolas", 10), bd=0, highlightthickness=0)
+        self.console_text.pack(fill=tk.BOTH, expand=True, padx=2, pady=2)
         
     def create_status_bar(self):
         # Frame do status bar
