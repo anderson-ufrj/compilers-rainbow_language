@@ -1,0 +1,33 @@
+RAINBOW
+
+// Exemplo de estruturas condicionais
+GLOBAL #idade recebe 18.
+GLOBAL #nome recebe "João".
+
+mostrar "Nome: " + #nome.
+mostrar "Idade: " + #idade.
+
+se #idade >= 18:
+BLOCO
+    mostrar #nome + " é maior de idade.".
+    se #idade >= 65:
+    BLOCO
+        mostrar #nome + " é idoso.".
+    BLOCO
+    senao:
+    BLOCO
+        mostrar #nome + " é adulto.".
+    BLOCO
+BLOCO
+senao:
+BLOCO
+    mostrar #nome + " é menor de idade.".
+    se #idade >= 12:
+    BLOCO
+        mostrar #nome + " é adolescente.".
+    BLOCO
+    senao:
+    BLOCO
+        mostrar #nome + " é criança.".
+    BLOCO
+BLOCO

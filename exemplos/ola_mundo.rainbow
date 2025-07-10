@@ -1,0 +1,5 @@
+RAINBOW
+
+// Programa simples de saudação
+GLOBAL #nome recebe "Mundo".
+mostrar "Olá, " + #nome + "!".
