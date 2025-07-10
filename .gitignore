@@ -20,14 +20,18 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Project specific
+# Project specific - arquivos gerados automaticamente
 *.tokens
 *.errors
 *.syntax.errors
+*.semantic.errors
+*.semantic.json
 *.ast
 *.stats
 *.analysis.json
 *.ast.json
+*.simbolos
+generated/
 Scratches and Consoles/
 External Libraries/
 
