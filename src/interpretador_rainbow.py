@@ -39,7 +39,11 @@ class InterpretadorRainbow:
             result = subprocess.run([sys.executable, compilador_path, arquivo_path], 
                                   capture_output=True, text=True)
             
-            # Verificar apenas erros léxicos e sintáticos críticos
+            # Verificar se o processo retornou com erro crítico
+            if result.returncode != 0:
+                return False
+                
+            # Verificar apenas erros léxicos e sintáticos críticos nos arquivos
             base_name = arquivo_path.rsplit('.', 1)[0]
             critical_error_files = [
                 base_name + ".errors",
@@ -50,10 +54,17 @@ class InterpretadorRainbow:
                 if os.path.exists(error_file):
                     with open(error_file, 'r', encoding='utf-8') as f:
                         content = f.read().strip()
-                        if content and "Nenhum erro encontrado" not in content:
+                        # Verificar se há erros reais (não apenas texto de cabeçalho)
+                        lines = content.split('\n')
+                        error_found = False
+                        for line in lines:
+                            if 'Erro' in line and 'Nenhum erro' not in line:
+                                error_found = True
+                                break
+                        if error_found:
                             return False
                             
-            # Permitir erros semânticos menores que o interpretador pode lidar
+            # Se chegou aqui, pode prosseguir com a execução
             return True
             
         except Exception as e:
@@ -420,8 +431,12 @@ class InterpretadorRainbow:
         if self.ide_callback:
             return self.ide_callback(prompt)
         else:
-            # Para uso em linha de comando
-            return input(prompt + " ")
+            # Para uso em linha de comando, usar valor padrão se não houver entrada
+            try:
+                return input(prompt + " ")
+            except EOFError:
+                # Se não há entrada disponível, retornar string vazia
+                return ""
 
 def main():
     if len(sys.argv) != 2:

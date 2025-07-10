@@ -918,8 +918,13 @@ class RainbowIDE:
     def show_about(self):
         about_window = tk.Toplevel(self.root)
         about_window.title("Sobre Rainbow IDE")
-        about_window.geometry("400x300")
+        about_window.geometry("500x400")
         about_window.configure(bg=self.bg_color)
+        about_window.resizable(False, False)
+        
+        # Centralizar janela
+        about_window.transient(self.root)
+        about_window.grab_set()
         
         # Criar gradiente arco-íris
         gradient_frame = tk.Frame(about_window, height=50)
@@ -930,29 +935,46 @@ class RainbowIDE:
             label.place(relx=i/7, rely=0, relwidth=1/7, relheight=1)
             
         # Informações
-        info_text = """
-Rainbow IDE 🌈
+        info_text = """🌈 Rainbow IDE
 Versão 1.0
 
-Uma IDE para a linguagem Rainbow
-Desenvolvida em Python com Tkinter
+Ambiente de Desenvolvimento Integrado (IDE)
+para a linguagem de programação Rainbow
 
-Características:
-• Syntax highlighting
+📚 PROJETO ACADÊMICO
+Disciplina: Compiladores
+Instituição: IFSULDEMINAS Campus Muzambinho
+Professor: Hudson
+
+👨‍💻 DESENVOLVEDORES
+• Anderson Henrique da Silva
+• Lurian Letícia dos Reis
+
+⚡ CARACTERÍSTICAS
+• Editor com syntax highlighting
 • Análise léxica, sintática e semântica
+• Interpretador integrado
 • Visualização de tokens, AST e símbolos
-• Detecção e destaque de erros
+• Sistema de temas (claro/escuro)
+• Execução interativa de programas
+• Exemplos educacionais inclusos
+
+🛠️ TECNOLOGIAS
+• Python 3.10+
+• Tkinter (Interface Gráfica)
+• Compilador Rainbow personalizado
         """
         
         info_label = tk.Label(about_window, text=info_text, 
                              bg=self.bg_color, fg=self.text_fg,
-                             font=("Arial", 11), justify=tk.LEFT)
-        info_label.pack(pady=20)
+                             font=("Arial", 10), justify=tk.LEFT)
+        info_label.pack(pady=15, padx=20)
         
         # Botão fechar
         close_btn = tk.Button(about_window, text="Fechar", 
                              command=about_window.destroy,
-                             bg=self.button_bg, fg=self.text_fg)
+                             bg=self.button_bg, fg=self.text_fg,
+                             font=("Arial", 12), padx=20, pady=5)
         close_btn.pack(pady=10)
 
 def main():
