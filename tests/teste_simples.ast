@@ -1,8 +1,0 @@
-=== ÁRVORE SINTÁTICA ABSTRATA ===
-Gerado em: 2025-07-10 08:49:41
-
-PROGRAMA: RAINBOW (L:1, C:1)
-  ATRIBUICAO: #nome (L:3, C:1)
-    LITERAL: "João" (L:3, C:14)
-  CHAMADA_FUNCAO: mostrar (L:4, C:1)
-    VARIAVEL: #nome (L:4, C:9)
