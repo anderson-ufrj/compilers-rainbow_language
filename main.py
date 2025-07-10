@@ -1367,13 +1367,57 @@ class RainbowIDE:
         
         def pedir_entrada():
             try:
-                valor = tk.simpledialog.askstring("Entrada", prompt, parent=self.root)
-                if valor is None:
-                    valor = ""
-                resultado[0] = valor
-            except:
+                # Criar dialog customizado com suporte ao Enter
+                dialog = tk.Toplevel(self.root)
+                dialog.title("Entrada")
+                dialog.geometry("400x150")
+                dialog.transient(self.root)
+                dialog.grab_set()
+                
+                # Centralizar dialog
+                dialog.update_idletasks()
+                x = (dialog.winfo_screenwidth() // 2) - (dialog.winfo_width() // 2)
+                y = (dialog.winfo_screenheight() // 2) - (dialog.winfo_height() // 2)
+                dialog.geometry(f"+{x}+{y}")
+                
+                # Label com prompt
+                label = tk.Label(dialog, text=prompt, wraplength=350)
+                label.pack(pady=10)
+                
+                # Entry para input
+                entry_var = tk.StringVar()
+                entry = tk.Entry(dialog, textvariable=entry_var, width=40)
+                entry.pack(pady=5)
+                entry.focus_set()
+                
+                # Frame para botões
+                button_frame = tk.Frame(dialog)
+                button_frame.pack(pady=10)
+                
+                def confirmar():
+                    resultado[0] = entry_var.get()
+                    dialog.destroy()
+                    evento.set()
+                
+                def cancelar():
+                    resultado[0] = ""
+                    dialog.destroy()
+                    evento.set()
+                
+                # Botões
+                tk.Button(button_frame, text="Enviar", command=confirmar).pack(side="left", padx=5)
+                tk.Button(button_frame, text="Cancelar", command=cancelar).pack(side="left", padx=5)
+                
+                # Bind Enter key to confirm
+                entry.bind('<Return>', lambda e: confirmar())
+                dialog.bind('<Escape>', lambda e: cancelar())
+                
+                # Aguardar fechamento do dialog
+                dialog.wait_window()
+                
+            except Exception as e:
+                print(f"Erro no dialog: {e}")
                 resultado[0] = ""
-            finally:
                 evento.set()
                 
         self.root.after(0, pedir_entrada)

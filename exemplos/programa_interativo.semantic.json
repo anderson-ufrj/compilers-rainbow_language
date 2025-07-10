@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "timestamp": "2025-07-10T18:46:59.838339",
+    "total_simbolos": 4,
+    "total_erros": 1,
+    "total_avisos": 0
+  },
+  "simbolos": [
+    {
+      "nome": "#nome",
+      "tipo": "TEXTO",
+      "escopo": "GLOBAL",
+      "linha": 4,
+      "coluna": 1,
+      "declarado": true,
+      "usado": true,
+      "valor_inicial": null
+    },
+    {
+      "nome": "#idade",
+      "tipo": "TEXTO",
+      "escopo": "GLOBAL",
+      "linha": 5,
+      "coluna": 1,
+      "declarado": true,
+      "usado": true,
+      "valor_inicial": null
+    },
+    {
+      "nome": "#ano_atual",
+      "tipo": "NUMERO",
+      "escopo": "GLOBAL",
+      "linha": 20,
+      "coluna": 1,
+      "declarado": true,
+      "usado": true,
+      "valor_inicial": null
+    },
+    {
+      "nome": "#ano_nascimento",
+      "tipo": "NUMERO",
+      "escopo": "GLOBAL",
+      "linha": 21,
+      "coluna": 1,
+      "declarado": true,
+      "usado": true,
+      "valor_inicial": null
+    }
+  ],
+  "erros": [
+    "Linha: 21 - Coluna: 35 - Erro: Operador '-' requer operandos do tipo 'numero'"
+  ],
+  "avisos": [],
+  "estatisticas": {
+    "simbolos_por_tipo": {
+      "TEXTO": 2,
+      "NUMERO": 2
+    },
+    "simbolos_por_escopo": {
+      "GLOBAL": 4
+    },
+    "simbolos_nao_usados": 0
+  }
+}

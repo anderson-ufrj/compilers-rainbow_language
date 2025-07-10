@@ -1,0 +1,11 @@
+=== TABELA DE SÍMBOLOS ===
+Gerado em: 2025-07-10 18:34:16
+
+=== SÍMBOLOS DECLARADOS ===
+✓ #idade | Tipo: NUMERO | Escopo: GLOBAL | Linha: 03, Coluna: 01
+✓ #nome | Tipo: TEXTO | Escopo: GLOBAL | Linha: 04, Coluna: 01
+
+=== RESUMO ===
+Total de símbolos: 2
+Total de erros: 0
+Total de avisos: 0

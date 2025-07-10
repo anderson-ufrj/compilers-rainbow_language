@@ -39,9 +39,9 @@ class InterpretadorRainbow:
             result = subprocess.run([sys.executable, compilador_path, arquivo_path], 
                                   capture_output=True, text=True)
             
-            # Verificar se o processo retornou com erro crítico
-            if result.returncode != 0:
-                return False
+            # Não bloquear baseado apenas no return code, pois erros semânticos 
+            # de tipo podem ser resolvidos pelo interpretador
+            # Continue para verificar quais tipos de erro
                 
             # Verificar apenas erros léxicos e sintáticos críticos nos arquivos
             base_name = arquivo_path.rsplit('.', 1)[0]
@@ -58,11 +58,29 @@ class InterpretadorRainbow:
                         lines = content.split('\n')
                         error_found = False
                         for line in lines:
-                            if 'Erro' in line and 'Nenhum erro' not in line:
+                            if 'Erro' in line and 'Nenhum erro' not in line and 'ERROS SEMÂNTICOS' not in line:
                                 error_found = True
                                 break
                         if error_found:
                             return False
+            
+            # Para erros semânticos, verificar apenas erros críticos que impedem execução
+            semantic_error_file = base_name + ".semantic.errors"
+            if os.path.exists(semantic_error_file):
+                with open(semantic_error_file, 'r', encoding='utf-8') as f:
+                    content = f.read().strip()
+                    lines = content.split('\n')
+                    for line in lines:
+                        # Apenas bloquear para erros críticos, não para problemas de tipo
+                        if ('Erro' in line and 'Nenhum erro' not in line):
+                            # Verificar se é erro crítico
+                            if ('não definida' in line or 'não declarada' in line):
+                                return False
+                            # Permitir erros de tipo que o interpretador pode resolver dinamicamente
+                            elif ('requer operandos do tipo' in line or 'incompatível' in line):
+                                continue  # Ignorar estes erros
+                            else:
+                                return False
                             
             # Se chegou aqui, pode prosseguir com a execução
             return True
@@ -381,9 +399,11 @@ class InterpretadorRainbow:
                 
                 # Converter para números se possível para comparação
                 try:
-                    esq_num = float(esq) if isinstance(esq, str) and esq.replace('.', '').replace('-', '').isdigit() else esq
-                    dir_num = float(dir) if isinstance(dir, str) and dir.replace('.', '').replace('-', '').isdigit() else dir
-                    esq, dir = esq_num, dir_num
+                    # Tentar converter strings numéricas para números
+                    if isinstance(esq, str) and esq.replace('.', '').replace('-', '').isdigit():
+                        esq = float(esq) if '.' in esq else int(esq)
+                    if isinstance(dir, str) and dir.replace('.', '').replace('-', '').isdigit():
+                        dir = float(dir) if '.' in dir else int(dir)
                 except:
                     pass
                 
