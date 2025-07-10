@@ -1,0 +1,467 @@
+{
+  "metadata": {
+    "timestamp": "2025-07-10T13:54:23.112707",
+    "total_tokens": 70,
+    "total_erros": 0,
+    "estatisticas": {
+      "total_linhas": 21,
+      "total_caracteres": 361,
+      "tokens_por_tipo": {
+        "RAINBOW": 1,
+        "FIM_LINHA": 9,
+        "VARIAVEL": 10,
+        "OPER_ATRIBUICAO": 2,
+        "NUMERO": 7,
+        "MOSTRAR": 6,
+        "ABRE_PARENTESES": 6,
+        "TEXTO": 6,
+        "FECHA_PARENTESES": 6,
+        "PARA": 2,
+        "DE": 2,
+        "ATE": 2,
+        "PASSO": 2,
+        "ABRE_CHAVES": 2,
+        "OPER_SOMA": 5,
+        "FECHA_CHAVES": 2,
+        "EOF": 1
+      },
+      "palavras_reservadas_usadas": [
+        "RAINBOW",
+        "passo",
+        "mostrar",
+        "para",
+        "recebe",
+        "ate",
+        "de"
+      ],
+      "variaveis_declaradas": [
+        "#i",
+        "#soma",
+        "#par"
+      ]
+    }
+  },
+  "tokens": [
+    {
+      "tipo": "RAINBOW",
+      "lexema": "RAINBOW",
+      "linha": 1,
+      "coluna": 1
+    },
+    {
+      "tipo": "FIM_LINHA",
+      "lexema": ".",
+      "linha": 1,
+      "coluna": 8
+    },
+    {
+      "tipo": "VARIAVEL",
+      "lexema": "#soma",
+      "linha": 4,
+      "coluna": 1
+    },
+    {
+      "tipo": "OPER_ATRIBUICAO",
+      "lexema": "recebe",
+      "linha": 4,
+      "coluna": 7
+    },
+    {
+      "tipo": "NUMERO",
+      "lexema": "0",
+      "linha": 4,
+      "coluna": 14
+    },
+    {
+      "tipo": "FIM_LINHA",
+      "lexema": ".",
+      "linha": 4,
+      "coluna": 15
+    },
+    {
+      "tipo": "MOSTRAR",
+      "lexema": "mostrar",
+      "linha": 6,
+      "coluna": 1
+    },
+    {
+      "tipo": "ABRE_PARENTESES",
+      "lexema": "(",
+      "linha": 6,
+      "coluna": 8
+    },
+    {
+      "tipo": "TEXTO",
+      "lexema": "\"Calculando soma de 1 a 10:\"",
+      "linha": 6,
+      "coluna": 9
+    },
+    {
+      "tipo": "FECHA_PARENTESES",
+      "lexema": ")",
+      "linha": 6,
+      "coluna": 37
+    },
+    {
+      "tipo": "FIM_LINHA",
+      "lexema": ".",
+      "linha": 6,
+      "coluna": 38
+    },
+    {
+      "tipo": "PARA",
+      "lexema": "para",
+      "linha": 8,
+      "coluna": 1
+    },
+    {
+      "tipo": "VARIAVEL",
+      "lexema": "#i",
+      "linha": 8,
+      "coluna": 6
+    },
+    {
+      "tipo": "DE",
+      "lexema": "de",
+      "linha": 8,
+      "coluna": 9
+    },
+    {
+      "tipo": "NUMERO",
+      "lexema": "1",
+      "linha": 8,
+      "coluna": 12
+    },
+    {
+      "tipo": "ATE",
+      "lexema": "ate",
+      "linha": 8,
+      "coluna": 14
+    },
+    {
+      "tipo": "NUMERO",
+      "lexema": "10",
+      "linha": 8,
+      "coluna": 18
+    },
+    {
+      "tipo": "PASSO",
+      "lexema": "passo",
+      "linha": 8,
+      "coluna": 21
+    },
+    {
+      "tipo": "NUMERO",
+      "lexema": "1",
+      "linha": 8,
+      "coluna": 27
+    },
+    {
+      "tipo": "ABRE_CHAVES",
+      "lexema": "{",
+      "linha": 8,
+      "coluna": 29
+    },
+    {
+      "tipo": "VARIAVEL",
+      "lexema": "#soma",
+      "linha": 9,
+      "coluna": 5
+    },
+    {
+      "tipo": "OPER_ATRIBUICAO",
+      "lexema": "recebe",
+      "linha": 9,
+      "coluna": 11
+    },
+    {
+      "tipo": "VARIAVEL",
+      "lexema": "#soma",
+      "linha": 9,
+      "coluna": 18
+    },
+    {
+      "tipo": "OPER_SOMA",
+      "lexema": "+",
+      "linha": 9,
+      "coluna": 24
+    },
+    {
+      "tipo": "VARIAVEL",
+      "lexema": "#i",
+      "linha": 9,
+      "coluna": 26
+    },
+    {
+      "tipo": "FIM_LINHA",
+      "lexema": ".",
+      "linha": 9,
+      "coluna": 28
+    },
+    {
+      "tipo": "MOSTRAR",
+      "lexema": "mostrar",
+      "linha": 10,
+      "coluna": 5
+    },
+    {
+      "tipo": "ABRE_PARENTESES",
+      "lexema": "(",
+      "linha": 10,
+      "coluna": 12
+    },
+    {
+      "tipo": "TEXTO",
+      "lexema": "\"Adicionando \"",
+      "linha": 10,
+      "coluna": 13
+    },
+    {
+      "tipo": "OPER_SOMA",
+      "lexema": "+",
+      "linha": 10,
+      "coluna": 28
+    },
+    {
+      "tipo": "VARIAVEL",
+      "lexema": "#i",
+      "linha": 10,
+      "coluna": 30
+    },
+    {
+      "tipo": "OPER_SOMA",
+      "lexema": "+",
+      "linha": 10,
+      "coluna": 33
+    },
+    {
+      "tipo": "TEXTO",
+      "lexema": "\", soma atual: \"",
+      "linha": 10,
+      "coluna": 35
+    },
+    {
+      "tipo": "OPER_SOMA",
+      "lexema": "+",
+      "linha": 10,
+      "coluna": 52
+    },
+    {
+      "tipo": "VARIAVEL",
+      "lexema": "#soma",
+      "linha": 10,
+      "coluna": 54
+    },
+    {
+      "tipo": "FECHA_PARENTESES",
+      "lexema": ")",
+      "linha": 10,
+      "coluna": 59
+    },
+    {
+      "tipo": "FIM_LINHA",
+      "lexema": ".",
+      "linha": 10,
+      "coluna": 60
+    },
+    {
+      "tipo": "FECHA_CHAVES",
+      "lexema": "}",
+      "linha": 11,
+      "coluna": 1
+    },
+    {
+      "tipo": "MOSTRAR",
+      "lexema": "mostrar",
+      "linha": 13,
+      "coluna": 1
+    },
+    {
+      "tipo": "ABRE_PARENTESES",
+      "lexema": "(",
+      "linha": 13,
+      "coluna": 8
+    },
+    {
+      "tipo": "TEXTO",
+      "lexema": "\"Soma final: \"",
+      "linha": 13,
+      "coluna": 9
+    },
+    {
+      "tipo": "OPER_SOMA",
+      "lexema": "+",
+      "linha": 13,
+      "coluna": 24
+    },
+    {
+      "tipo": "VARIAVEL",
+      "lexema": "#soma",
+      "linha": 13,
+      "coluna": 26
+    },
+    {
+      "tipo": "FECHA_PARENTESES",
+      "lexema": ")",
+      "linha": 13,
+      "coluna": 31
+    },
+    {
+      "tipo": "FIM_LINHA",
+      "lexema": ".",
+      "linha": 13,
+      "coluna": 32
+    },
+    {
+      "tipo": "MOSTRAR",
+      "lexema": "mostrar",
+      "linha": 16,
+      "coluna": 1
+    },
+    {
+      "tipo": "ABRE_PARENTESES",
+      "lexema": "(",
+      "linha": 16,
+      "coluna": 8
+    },
+    {
+      "tipo": "TEXTO",
+      "lexema": "\"\"",
+      "linha": 16,
+      "coluna": 9
+    },
+    {
+      "tipo": "FECHA_PARENTESES",
+      "lexema": ")",
+      "linha": 16,
+      "coluna": 11
+    },
+    {
+      "tipo": "FIM_LINHA",
+      "lexema": ".",
+      "linha": 16,
+      "coluna": 12
+    },
+    {
+      "tipo": "MOSTRAR",
+      "lexema": "mostrar",
+      "linha": 17,
+      "coluna": 1
+    },
+    {
+      "tipo": "ABRE_PARENTESES",
+      "lexema": "(",
+      "linha": 17,
+      "coluna": 8
+    },
+    {
+      "tipo": "TEXTO",
+      "lexema": "\"Números pares de 2 a 20:\"",
+      "linha": 17,
+      "coluna": 9
+    },
+    {
+      "tipo": "FECHA_PARENTESES",
+      "lexema": ")",
+      "linha": 17,
+      "coluna": 35
+    },
+    {
+      "tipo": "FIM_LINHA",
+      "lexema": ".",
+      "linha": 17,
+      "coluna": 36
+    },
+    {
+      "tipo": "PARA",
+      "lexema": "para",
+      "linha": 19,
+      "coluna": 1
+    },
+    {
+      "tipo": "VARIAVEL",
+      "lexema": "#par",
+      "linha": 19,
+      "coluna": 6
+    },
+    {
+      "tipo": "DE",
+      "lexema": "de",
+      "linha": 19,
+      "coluna": 11
+    },
+    {
+      "tipo": "NUMERO",
+      "lexema": "2",
+      "linha": 19,
+      "coluna": 14
+    },
+    {
+      "tipo": "ATE",
+      "lexema": "ate",
+      "linha": 19,
+      "coluna": 16
+    },
+    {
+      "tipo": "NUMERO",
+      "lexema": "20",
+      "linha": 19,
+      "coluna": 20
+    },
+    {
+      "tipo": "PASSO",
+      "lexema": "passo",
+      "linha": 19,
+      "coluna": 23
+    },
+    {
+      "tipo": "NUMERO",
+      "lexema": "2",
+      "linha": 19,
+      "coluna": 29
+    },
+    {
+      "tipo": "ABRE_CHAVES",
+      "lexema": "{",
+      "linha": 19,
+      "coluna": 31
+    },
+    {
+      "tipo": "MOSTRAR",
+      "lexema": "mostrar",
+      "linha": 20,
+      "coluna": 5
+    },
+    {
+      "tipo": "ABRE_PARENTESES",
+      "lexema": "(",
+      "linha": 20,
+      "coluna": 12
+    },
+    {
+      "tipo": "VARIAVEL",
+      "lexema": "#par",
+      "linha": 20,
+      "coluna": 13
+    },
+    {
+      "tipo": "FECHA_PARENTESES",
+      "lexema": ")",
+      "linha": 20,
+      "coluna": 17
+    },
+    {
+      "tipo": "FIM_LINHA",
+      "lexema": ".",
+      "linha": 20,
+      "coluna": 18
+    },
+    {
+      "tipo": "FECHA_CHAVES",
+      "lexema": "}",
+      "linha": 21,
+      "coluna": 1
+    }
+  ],
+  "erros": []
+}

@@ -250,7 +250,8 @@ class RainbowIDE:
         examples_menu.add_command(label="🔄 Laço Para", command=lambda: self.open_example("laco_para.rainbow"))
         examples_menu.add_command(label="🏷️ Tipos de Dados", command=lambda: self.open_example("tipos_dados.rainbow"))
         examples_menu.add_separator()
-        examples_menu.add_command(label="💬 Programa Interativo", command=lambda: self.open_example("programa_interativo.rainbow"))
+        examples_menu.add_command(label="💬 Entrada do Usuário", command=lambda: self.open_example("entrada_usuario.rainbow"))
+        examples_menu.add_command(label="🤖 Programa Interativo", command=lambda: self.open_example("programa_interativo.rainbow"))
         
         # Menu Visualizar
         view_menu = tk.Menu(menubar, tearoff=0, bg=self.button_bg, fg=self.text_fg)

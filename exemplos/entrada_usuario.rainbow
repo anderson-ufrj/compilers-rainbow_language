@@ -1,0 +1,11 @@
+RAINBOW.
+
+// Exemplo simples de entrada do usuário
+#nome recebe ler("Digite seu nome: ").
+mostrar("Olá, " + #nome + "!").
+
+#cor recebe ler("Qual sua cor favorita? ").
+mostrar(#nome + " gosta da cor " + #cor + ".").
+
+mostrar("").
+mostrar("Obrigado por usar o programa Rainbow! 🌈").

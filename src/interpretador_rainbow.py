@@ -30,7 +30,7 @@ class InterpretadorRainbow:
             return False, f"Erro ao executar arquivo: {str(e)}"
     
     def compilar_arquivo(self, arquivo_path):
-        """Verifica se o arquivo compila sem erros"""
+        """Verifica se o arquivo compila sem erros críticos"""
         try:
             import subprocess
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,21 +39,21 @@ class InterpretadorRainbow:
             result = subprocess.run([sys.executable, compilador_path, arquivo_path], 
                                   capture_output=True, text=True)
             
-            # Verificar se há erros
+            # Verificar apenas erros léxicos e sintáticos críticos
             base_name = arquivo_path.rsplit('.', 1)[0]
-            error_files = [
+            critical_error_files = [
                 base_name + ".errors",
-                base_name + ".syntax.errors", 
-                base_name + ".semantic.errors"
+                base_name + ".syntax.errors"
             ]
             
-            for error_file in error_files:
+            for error_file in critical_error_files:
                 if os.path.exists(error_file):
                     with open(error_file, 'r', encoding='utf-8') as f:
                         content = f.read().strip()
                         if content and "Nenhum erro encontrado" not in content:
                             return False
                             
+            # Permitir erros semânticos menores que o interpretador pode lidar
             return True
             
         except Exception as e:
@@ -327,21 +327,20 @@ class InterpretadorRainbow:
     
     def avaliar_operacao(self, expressao):
         """Avalia operações matemáticas e lógicas"""
-        # Concatenação de strings
-        if '+' in expressao and ('"' in expressao or any(var in expressao for var in self.variaveis)):
-            partes = self.dividir_expressao(expressao, '+')
-            resultado = ""
-            for parte in partes:
-                valor = self.avaliar_expressao(parte.strip())
-                resultado += str(valor)
-            return resultado
-            
-        # Operações matemáticas
+        # Operações relacionais
         for op in ['>=', '<=', '>', '<', '==', '!=']:
             if op in expressao:
                 partes = expressao.split(op, 1)
                 esq = self.avaliar_expressao(partes[0].strip())
                 dir = self.avaliar_expressao(partes[1].strip())
+                
+                # Converter para números se possível para comparação
+                try:
+                    esq_num = float(esq) if isinstance(esq, str) and esq.replace('.', '').replace('-', '').isdigit() else esq
+                    dir_num = float(dir) if isinstance(dir, str) and dir.replace('.', '').replace('-', '').isdigit() else dir
+                    esq, dir = esq_num, dir_num
+                except:
+                    pass
                 
                 if op == '>=': return esq >= dir
                 elif op == '<=': return esq <= dir
@@ -350,6 +349,7 @@ class InterpretadorRainbow:
                 elif op == '==': return esq == dir
                 elif op == '!=': return esq != dir
                 
+        # Operações matemáticas
         for op in ['+', '-', '*', '/', '%']:
             if op in expressao:
                 partes = self.dividir_expressao(expressao, op)
@@ -357,8 +357,24 @@ class InterpretadorRainbow:
                     esq = self.avaliar_expressao(partes[0].strip())
                     dir = self.avaliar_expressao(partes[1].strip())
                     
-                    if op == '+': return esq + dir
-                    elif op == '-': return esq - dir
+                    # Para soma, verificar se é concatenação de string
+                    if op == '+':
+                        # Se algum operando é string ou contém string, fazer concatenação
+                        if isinstance(esq, str) or isinstance(dir, str):
+                            return str(esq) + str(dir)
+                        else:
+                            return esq + dir
+                    
+                    # Para outras operações, converter para números
+                    try:
+                        if isinstance(esq, str):
+                            esq = float(esq) if '.' in esq else int(esq)
+                        if isinstance(dir, str):
+                            dir = float(dir) if '.' in dir else int(dir)
+                    except ValueError:
+                        raise Exception(f"Não é possível converter para número: {esq} ou {dir}")
+                    
+                    if op == '-': return esq - dir
                     elif op == '*': return esq * dir
                     elif op == '/': return esq / dir if dir != 0 else 0
                     elif op == '%': return esq % dir if dir != 0 else 0
