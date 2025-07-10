@@ -284,6 +284,9 @@ class RainbowIDE:
         self.root.title("Rainbow IDE 🌈")
         self.root.geometry("1200x800")
         
+        # Ocultar janela principal até splash screen terminar
+        self.root.withdraw()
+        
         # Definir temas
         self.themes = {
             'dark': {
@@ -391,6 +394,11 @@ class RainbowIDE:
         
     def close_splash(self):
         self.splash.destroy()
+        # Mostrar janela principal
+        self.root.deiconify()
+        # Trazer para frente
+        self.root.lift()
+        self.root.focus_force()
         self.setup_ui()
         
     def setup_ui(self):
