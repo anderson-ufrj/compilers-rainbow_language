@@ -64,24 +64,89 @@ class RainbowIDE:
         self.root.title("Rainbow IDE 🌈")
         self.root.geometry("1200x800")
         
-        # Cores do tema
-        self.bg_color = "#1e1e1e"
-        self.text_bg = "#2d2d2d"
-        self.text_fg = "#ffffff"
-        self.highlight_bg = "#3d3d3d"
-        self.button_bg = "#4a4a4a"
-        self.success_color = "#4CAF50"
-        self.error_color = "#f44336"
-        self.rainbow_colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']
+        # Definir temas
+        self.themes = {
+            'dark': {
+                'bg_color': "#1e1e1e",
+                'text_bg': "#2d2d2d",
+                'text_fg': "#ffffff",
+                'highlight_bg': "#3d3d3d",
+                'button_bg': "#4a4a4a",
+                'toolbar_bg': "#2b2b2b",
+                'menu_bg': "#2b2b2b",
+                'border_color': "#555555",
+                'line_number_bg': "#252525",
+                'line_number_fg': "#858585",
+                'success_color': "#4CAF50",
+                'error_color': "#f44336",
+                'selection_bg': "#264f78",
+                'cursor_color': "#ffffff"
+            },
+            'light': {
+                'bg_color': "#f5f5f5",
+                'text_bg': "#ffffff",
+                'text_fg': "#000000",
+                'highlight_bg': "#e0e0e0",
+                'button_bg': "#ffffff",
+                'toolbar_bg': "#f8f8f8",
+                'menu_bg': "#ffffff",
+                'border_color': "#cccccc",
+                'line_number_bg': "#f5f5f5",
+                'line_number_fg': "#999999",
+                'success_color': "#4CAF50",
+                'error_color': "#f44336",
+                'selection_bg': "#0066cc",
+                'cursor_color': "#000000"
+            }
+        }
         
-        self.root.configure(bg=self.bg_color)
+        # Tema inicial (detectar preferência do sistema se possível)
+        self.current_theme = 'dark'
+        self.apply_theme(self.current_theme)
+        
+        self.rainbow_colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']
         
         # Variáveis
         self.current_file = None
         self.modified = False
         
+        # Configurar estilo macOS/Linux
+        self.setup_native_style()
+        
         # Mostrar animação de abertura
         self.show_splash_screen()
+        
+    def apply_theme(self, theme_name):
+        theme = self.themes[theme_name]
+        self.bg_color = theme['bg_color']
+        self.text_bg = theme['text_bg']
+        self.text_fg = theme['text_fg']
+        self.highlight_bg = theme['highlight_bg']
+        self.button_bg = theme['button_bg']
+        self.toolbar_bg = theme['toolbar_bg']
+        self.menu_bg = theme['menu_bg']
+        self.border_color = theme['border_color']
+        self.line_number_bg = theme['line_number_bg']
+        self.line_number_fg = theme['line_number_fg']
+        self.success_color = theme['success_color']
+        self.error_color = theme['error_color']
+        self.selection_bg = theme['selection_bg']
+        self.cursor_color = theme['cursor_color']
+        
+        self.root.configure(bg=self.bg_color)
+        
+    def setup_native_style(self):
+        # Detectar sistema operacional
+        import platform
+        system = platform.system()
+        
+        if system == "Darwin":  # macOS
+            # Configurações específicas do macOS
+            self.root.tk.call('tk::unsupported::MacWindowStyle', 'style', self.root._w, 'moveableModal', '')
+            # Adicionar padding para o traffic light buttons do macOS
+            self.macos_padding = 28
+        else:
+            self.macos_padding = 0
         
     def show_splash_screen(self):
         # Tela de splash com animação
@@ -173,16 +238,73 @@ class RainbowIDE:
         run_menu.add_command(label="Análise Semântica", command=self.run_semantic, accelerator="F7")
         run_menu.add_command(label="Compilação Completa", command=self.run_full, accelerator="F8")
         
+        # Menu Visualizar
+        view_menu = tk.Menu(menubar, tearoff=0, bg=self.button_bg, fg=self.text_fg)
+        menubar.add_cascade(label="Visualizar", menu=view_menu)
+        
+        # Submenu de temas
+        theme_menu = tk.Menu(view_menu, tearoff=0, bg=self.button_bg, fg=self.text_fg)
+        view_menu.add_cascade(label="Tema", menu=theme_menu)
+        theme_menu.add_radiobutton(label="🌙 Escuro", value="dark", 
+                                  variable=tk.StringVar(value=self.current_theme),
+                                  command=lambda: self.switch_theme('dark'))
+        theme_menu.add_radiobutton(label="☀️ Claro", value="light",
+                                  variable=tk.StringVar(value=self.current_theme),
+                                  command=lambda: self.switch_theme('light'))
+        
         # Menu Ajuda
         help_menu = tk.Menu(menubar, tearoff=0, bg=self.button_bg, fg=self.text_fg)
         menubar.add_cascade(label="Ajuda", menu=help_menu)
         help_menu.add_command(label="Sobre", command=self.show_about)
         
-    def create_toolbar(self):
-        toolbar = ttk.Frame(self.root, style="Toolbar.TFrame")
-        toolbar.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+    def switch_theme(self, theme_name):
+        self.current_theme = theme_name
+        self.apply_theme(theme_name)
+        self.update_theme_colors()
         
-        # Botões com ícones coloridos (usando texto como ícones)
+    def update_theme_colors(self):
+        # Atualizar cores de todos os widgets existentes
+        if hasattr(self, 'text_editor'):
+            self.text_editor.config(bg=self.text_bg, fg=self.text_fg, 
+                                  insertbackground=self.cursor_color,
+                                  selectbackground=self.selection_bg)
+        if hasattr(self, 'line_numbers'):
+            self.line_numbers.config(bg=self.line_number_bg, fg=self.line_number_fg)
+        if hasattr(self, 'toolbar_frame'):
+            self.toolbar_frame.config(bg=self.toolbar_bg)
+            # Atualizar botões da toolbar
+            for btn in self.toolbar_buttons:
+                btn.config(bg=self.toolbar_bg, fg=self.text_fg,
+                          activebackground=self.highlight_bg)
+        if hasattr(self, 'status_bar'):
+            self.status_bar.config(bg=self.toolbar_bg, fg=self.text_fg)
+            self.position_label.config(bg=self.toolbar_bg, fg=self.text_fg)
+            theme_indicator = "🌙" if self.current_theme == "dark" else "☀️"
+            self.theme_label.config(text=theme_indicator, bg=self.toolbar_bg, fg=self.text_fg)
+            
+        # Atualizar cores das abas de saída
+        if hasattr(self, 'tokens_text'):
+            for widget in [self.tokens_text, self.ast_text, self.symbols_text, 
+                          self.errors_text, self.console_text]:
+                widget.config(bg=self.text_bg, fg=self.text_fg)
+                
+        # Re-aplicar syntax highlighting
+        if hasattr(self, 'setup_syntax_highlighting'):
+            self.setup_syntax_highlighting()
+            self.apply_syntax_highlighting()
+            
+    def create_toolbar(self):
+        # Frame da toolbar com estilo moderno
+        self.toolbar_frame = tk.Frame(self.root, bg=self.toolbar_bg, height=40)
+        self.toolbar_frame.pack(side=tk.TOP, fill=tk.X, pady=(self.macos_padding, 0))
+        self.toolbar_frame.pack_propagate(False)
+        
+        # Container interno para centralizar botões
+        button_container = tk.Frame(self.toolbar_frame, bg=self.toolbar_bg)
+        button_container.pack(expand=True)
+        
+        # Botões modernos com hover effect
+        self.toolbar_buttons = []
         buttons = [
             ("📄", self.new_file, "Novo arquivo"),
             ("📂", self.open_file, "Abrir arquivo"),
@@ -196,14 +318,24 @@ class RainbowIDE:
         
         for icon, command, tooltip in buttons:
             if icon == "|":
-                ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, padx=5, fill=tk.Y)
+                sep = tk.Frame(button_container, width=1, bg=self.border_color)
+                sep.pack(side=tk.LEFT, padx=10, pady=5, fill=tk.Y)
             else:
-                btn = tk.Button(toolbar, text=icon, command=command, 
-                               bg=self.button_bg, fg=self.text_fg,
-                               bd=0, padx=10, pady=5, font=("Arial", 16))
+                btn = tk.Button(button_container, text=icon, command=command,
+                               bg=self.toolbar_bg, fg=self.text_fg,
+                               bd=0, padx=10, pady=5, font=("Arial", 14),
+                               activebackground=self.highlight_bg,
+                               highlightthickness=0)
                 btn.pack(side=tk.LEFT, padx=2)
+                
+                # Adicionar hover effect
+                btn.bind("<Enter>", lambda e, b=btn: b.config(bg=self.highlight_bg))
+                btn.bind("<Leave>", lambda e, b=btn: b.config(bg=self.toolbar_bg))
+                
                 if tooltip:
                     self.create_tooltip(btn, tooltip)
+                    
+                self.toolbar_buttons.append(btn)
                     
     def create_tooltip(self, widget, text):
         def on_enter(event):
@@ -239,15 +371,21 @@ class RainbowIDE:
         # Números de linha
         self.line_numbers = tk.Text(text_frame, width=4, padx=3, takefocus=0,
                                    border=0, state='disabled',
-                                   background=self.bg_color, foreground=self.text_fg)
+                                   background=self.line_number_bg, foreground=self.line_number_fg,
+                                   font=("Consolas", 12))
         self.line_numbers.pack(side=tk.LEFT, fill=tk.Y)
+        
+        # Separador entre números e editor
+        separator = tk.Frame(text_frame, width=1, bg=self.border_color)
+        separator.pack(side=tk.LEFT, fill=tk.Y)
         
         # Editor de texto
         self.text_editor = tk.Text(text_frame, wrap=tk.NONE, undo=True,
                                   background=self.text_bg, foreground=self.text_fg,
-                                  insertbackground=self.text_fg,
-                                  selectbackground=self.highlight_bg,
-                                  font=("Consolas", 12))
+                                  insertbackground=self.cursor_color,
+                                  selectbackground=self.selection_bg,
+                                  font=("Consolas", 12),
+                                  bd=0, highlightthickness=0)
         self.text_editor.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
         # Scrollbars
@@ -262,8 +400,9 @@ class RainbowIDE:
         
         # Vincular eventos
         self.text_editor.bind("<<Modified>>", self.on_text_modified)
-        self.text_editor.bind("<KeyRelease>", self.update_line_numbers)
-        self.text_editor.bind("<Button-1>", self.update_line_numbers)
+        self.text_editor.bind("<KeyRelease>", self.on_key_release)
+        self.text_editor.bind("<Button-1>", self.on_click)
+        self.text_editor.bind("<ButtonRelease-1>", self.update_cursor_position)
         
         # Painel direito - Resultados
         right_frame = ttk.Frame(main_paned)
@@ -323,10 +462,33 @@ class RainbowIDE:
         self.console_text.pack(fill=tk.BOTH, expand=True)
         
     def create_status_bar(self):
-        self.status_bar = tk.Label(self.root, text="Pronto", 
-                                  bg=self.button_bg, fg=self.text_fg,
-                                  bd=1, relief=tk.SUNKEN, anchor=tk.W)
-        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+        # Frame do status bar
+        status_frame = tk.Frame(self.root, bg=self.toolbar_bg, height=25)
+        status_frame.pack(side=tk.BOTTOM, fill=tk.X)
+        status_frame.pack_propagate(False)
+        
+        # Linha separadora
+        separator = tk.Frame(self.root, height=1, bg=self.border_color)
+        separator.pack(side=tk.BOTTOM, fill=tk.X)
+        
+        # Status text
+        self.status_bar = tk.Label(status_frame, text="Pronto", 
+                                  bg=self.toolbar_bg, fg=self.text_fg,
+                                  anchor=tk.W, padx=10)
+        self.status_bar.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        # Informações adicionais (linha:coluna)
+        self.position_label = tk.Label(status_frame, text="Ln 1, Col 1",
+                                      bg=self.toolbar_bg, fg=self.text_fg,
+                                      padx=10)
+        self.position_label.pack(side=tk.RIGHT)
+        
+        # Indicador de tema
+        theme_indicator = "🌙" if self.current_theme == "dark" else "☀️"
+        self.theme_label = tk.Label(status_frame, text=theme_indicator,
+                                   bg=self.toolbar_bg, fg=self.text_fg,
+                                   padx=10)
+        self.theme_label.pack(side=tk.RIGHT)
         
     def setup_keybindings(self):
         self.root.bind('<Control-n>', lambda e: self.new_file())
@@ -339,21 +501,29 @@ class RainbowIDE:
         self.root.bind('<F8>', lambda e: self.run_full())
         
     def setup_syntax_highlighting(self):
-        # Tags para syntax highlighting
-        self.text_editor.tag_configure("keyword", foreground="#569cd6")
-        self.text_editor.tag_configure("string", foreground="#ce9178")
-        self.text_editor.tag_configure("comment", foreground="#6a9955")
-        self.text_editor.tag_configure("number", foreground="#b5cea8")
-        self.text_editor.tag_configure("variable", foreground="#9cdcfe")
-        self.text_editor.tag_configure("operator", foreground="#d4d4d4")
-        self.text_editor.tag_configure("error", background="#ff0000", foreground="#ffffff")
+        # Tags para syntax highlighting baseadas no tema
+        if self.current_theme == 'dark':
+            self.text_editor.tag_configure("keyword", foreground="#569cd6")
+            self.text_editor.tag_configure("string", foreground="#ce9178")
+            self.text_editor.tag_configure("comment", foreground="#6a9955")
+            self.text_editor.tag_configure("number", foreground="#b5cea8")
+            self.text_editor.tag_configure("variable", foreground="#9cdcfe")
+            self.text_editor.tag_configure("operator", foreground="#d4d4d4")
+        else:  # light theme
+            self.text_editor.tag_configure("keyword", foreground="#0000ff")
+            self.text_editor.tag_configure("string", foreground="#a31515")
+            self.text_editor.tag_configure("comment", foreground="#008000")
+            self.text_editor.tag_configure("number", foreground="#098658")
+            self.text_editor.tag_configure("variable", foreground="#001080")
+            self.text_editor.tag_configure("operator", foreground="#000000")
+            
+        self.text_editor.tag_configure("error", background=self.error_color, foreground="#ffffff")
         
         # Palavras-chave da linguagem Rainbow
         self.keywords = ["RAINBOW", "NUMERO", "TEXTO", "LOGICO", "LISTA", "GLOBAL", "se", "senao", 
                         "senaose", "para", "enquanto", "mostrar", "ler", "recebe", "e", "ou", "nao"]
         
-        # Bind para colorir enquanto digita
-        self.text_editor.bind("<KeyRelease>", self.apply_syntax_highlighting)
+        # Keywords já são coloridas pelo on_key_release
         
     def sync_scroll(self, *args):
         self.line_numbers.yview(*args)
@@ -363,6 +533,19 @@ class RainbowIDE:
         self.modified = True
         self.update_title()
         self.text_editor.edit_modified(False)
+        
+    def on_key_release(self, event=None):
+        self.update_line_numbers()
+        self.apply_syntax_highlighting()
+        self.update_cursor_position()
+        
+    def on_click(self, event=None):
+        self.update_line_numbers()
+        
+    def update_cursor_position(self, event=None):
+        position = self.text_editor.index(tk.INSERT)
+        line, col = position.split('.')
+        self.position_label.config(text=f"Ln {line}, Col {int(col) + 1}")
         
     def update_line_numbers(self, event=None):
         lines = self.text_editor.get("1.0", "end-1c").split("\n")
