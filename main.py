@@ -357,42 +357,57 @@ class RainbowIDE:
         # Definir temas
         self.themes = {
             'dark': {
-                'bg_color': "#1e1e1e",
-                'text_bg': "#2d2d2d",
-                'text_fg': "#ffffff",
-                'highlight_bg': "#3d3d3d",
-                'button_bg': "#4a4a4a",
-                'toolbar_bg': "#2b2b2b",
-                'menu_bg': "#2b2b2b",
-                'border_color': "#555555",
-                'line_number_bg': "#252525",
-                'line_number_fg': "#858585",
-                'success_color': "#4CAF50",
-                'error_color': "#f44336",
-                'selection_bg': "#264f78",
-                'cursor_color': "#ffffff"
+                'bg_color': "#0D1117",           # GitHub Dark background
+                'text_bg': "#161B22",           # Mais escuro e elegante
+                'text_fg': "#E6EDF3",           # Texto mais suave
+                'highlight_bg': "#21262D",      # Hover mais sutil
+                'button_bg': "#1F2937",         # Botões modernos
+                'toolbar_bg': "#010409",        # Toolbar mais escura
+                'menu_bg': "#161B22",           # Menu consistente
+                'border_color': "#30363D",      # Bordas mais suaves
+                'line_number_bg': "#0D1117",   # Números de linha integrados
+                'line_number_fg': "#6E7681",   # Números mais discretos
+                'success_color': "#238636",     # Verde GitHub
+                'error_color': "#DA3633",       # Vermelho GitHub
+                'selection_bg': "#264F78",      # Seleção azul
+                'cursor_color': "#E6EDF3",      # Cursor branco suave
+                'accent_color': "#0969DA",      # Azul accent GitHub
+                'secondary_bg': "#0D1117",     # Background secundário
+                'tab_active': "#1F2937",        # Aba ativa
+                'tab_inactive': "#161B22",      # Aba inativa
+                'shadow_color': "#000000"       # Sombras
             },
             'light': {
-                'bg_color': "#f5f5f5",
-                'text_bg': "#ffffff",
-                'text_fg': "#000000",
-                'highlight_bg': "#e0e0e0",
-                'button_bg': "#ffffff",
-                'toolbar_bg': "#f8f8f8",
-                'menu_bg': "#ffffff",
-                'border_color': "#cccccc",
-                'line_number_bg': "#f5f5f5",
-                'line_number_fg': "#999999",
-                'success_color': "#4CAF50",
-                'error_color': "#f44336",
-                'selection_bg': "#0066cc",
-                'cursor_color': "#000000"
+                'bg_color': "#FAFBFC",           # Background mais suave
+                'text_bg': "#FFFFFF",           # Editor branco puro
+                'text_fg': "#24292F",           # Texto escuro GitHub
+                'highlight_bg': "#F6F8FA",      # Hover cinza claro
+                'button_bg': "#F6F8FA",         # Botões cinza claro
+                'toolbar_bg': "#F6F8FA",        # Toolbar harmoniosa
+                'menu_bg': "#FFFFFF",           # Menu branco
+                'border_color': "#D0D7DE",      # Bordas cinza claro
+                'line_number_bg': "#F6F8FA",   # Números harmoniosos
+                'line_number_fg': "#656D76",   # Números discretos
+                'success_color': "#1A7F37",     # Verde GitHub claro
+                'error_color': "#CF222E",       # Vermelho GitHub claro
+                'selection_bg': "#0969DA",      # Seleção azul
+                'cursor_color': "#24292F",      # Cursor escuro
+                'accent_color': "#0969DA",      # Azul accent GitHub
+                'secondary_bg': "#F6F8FA",     # Background secundário
+                'tab_active': "#FFFFFF",        # Aba ativa branca
+                'tab_inactive': "#F6F8FA",      # Aba inativa cinza
+                'shadow_color': "#8C959F"       # Sombras cinza
             }
         }
         
         # Tema inicial (detectar preferência do sistema se possível)
         self.current_theme = 'dark'
         self.apply_theme(self.current_theme)
+        
+        # Configurações de UI moderna
+        self.corner_radius = 8
+        self.padding = 16
+        self.spacing = 8
         
         self.rainbow_colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']
         
@@ -632,49 +647,115 @@ class RainbowIDE:
             
     def create_toolbar(self):
         # Frame da toolbar com estilo moderno
-        self.toolbar_frame = tk.Frame(self.root, bg=self.toolbar_bg, height=40)
+        self.toolbar_frame = tk.Frame(self.root, bg=self.toolbar_bg, height=56)
         self.toolbar_frame.pack(side=tk.TOP, fill=tk.X, pady=(self.macos_padding, 0))
         self.toolbar_frame.pack_propagate(False)
         
-        # Container interno para centralizar botões
-        button_container = tk.Frame(self.toolbar_frame, bg=self.toolbar_bg)
-        button_container.pack(expand=True)
+        # Adicionar sombra sutil na parte inferior
+        shadow = tk.Frame(self.root, height=1, bg=self.border_color)
+        shadow.pack(side=tk.TOP, fill=tk.X)
         
-        # Botões modernos com hover effect
+        # Container para botões alinhados à esquerda
+        left_container = tk.Frame(self.toolbar_frame, bg=self.toolbar_bg)
+        left_container.pack(side=tk.LEFT, padx=12, pady=8)
+        
+        # Container para indicadores à direita
+        right_container = tk.Frame(self.toolbar_frame, bg=self.toolbar_bg)
+        right_container.pack(side=tk.RIGHT, padx=12, pady=8)
+        
+        # Botões modernos organizados em grupos
         self.toolbar_buttons = []
-        buttons = [
-            ("📄", self.new_file, "Novo arquivo"),
-            ("📂", self.open_file, "Abrir arquivo"),
-            ("💾", self.save_file, "Salvar"),
-            ("|", None, None),  # Separador
-            ("▶️", self.run_program, "Executar Programa"),
-            ("🔧", self.run_full, "Compilar"),
-            ("🔤", self.run_lexical, "Análise Léxica"),
-            ("🌳", self.run_syntactic, "Análise Sintática"),
-            ("✅", self.run_semantic, "Análise Semântica"),
+        button_groups = [
+            # Grupo: Arquivo
+            [("🗎", self.new_file, "Novo arquivo (Ctrl+N)"),
+             ("📁", self.open_file, "Abrir arquivo (Ctrl+O)"),
+             ("💾", self.save_file, "Salvar (Ctrl+S)")],
+            # Grupo: Execução
+            [("▶", self.run_program, "Executar Programa (F5)"),
+             ("⚙", self.run_full, "Compilar (F6)")],
+            # Grupo: Análises
+            [("📝", self.run_lexical, "Análise Léxica (F7)"),
+             ("🌲", self.run_syntactic, "Análise Sintática (F8)"),
+             ("🔍", self.run_semantic, "Análise Semântica (F9)")]
         ]
         
-        for icon, command, tooltip in buttons:
-            if icon == "|":
-                sep = tk.Frame(button_container, width=1, bg=self.border_color)
-                sep.pack(side=tk.LEFT, padx=10, pady=5, fill=tk.Y)
-            else:
-                btn = tk.Button(button_container, text=icon, command=command,
-                               bg=self.toolbar_bg, fg=self.text_fg,
-                               bd=0, padx=10, pady=5, font=("Arial", 14),
-                               activebackground=self.highlight_bg,
-                               highlightthickness=0)
-                btn.pack(side=tk.LEFT, padx=2)
-                
-                # Adicionar hover effect
-                btn.bind("<Enter>", lambda e, b=btn: b.config(bg=self.highlight_bg))
-                btn.bind("<Leave>", lambda e, b=btn: b.config(bg=self.toolbar_bg))
-                
-                if tooltip:
-                    self.create_tooltip(btn, tooltip)
-                    
+        # Criar grupos de botões com separadores
+        for group_index, group in enumerate(button_groups):
+            if group_index > 0:
+                # Separador entre grupos
+                sep = tk.Frame(left_container, width=1, bg=self.border_color)
+                sep.pack(side=tk.LEFT, padx=8, pady=8, fill=tk.Y)
+            
+            for icon, command, tooltip in group:
+                btn = self.create_modern_button(left_container, icon, command, tooltip)
                 self.toolbar_buttons.append(btn)
-                    
+        
+        # Indicadores à direita
+        self.create_status_indicators(right_container)
+    def create_modern_button(self, parent, icon, command, tooltip):
+        """Cria um botão moderno com hover effect"""
+        btn = tk.Button(parent, text=icon, command=command,
+                       bg=self.button_bg, fg=self.text_fg,
+                       bd=0, padx=12, pady=8, font=("Arial", 16),
+                       relief='flat', cursor='hand2',
+                       activebackground=self.highlight_bg)
+        btn.pack(side=tk.LEFT, padx=2)
+        
+        # Hover effect moderno
+        def on_enter(event):
+            btn.config(bg=self.highlight_bg)
+        
+        def on_leave(event):
+            btn.config(bg=self.button_bg)
+        
+        btn.bind("<Enter>", on_enter)
+        btn.bind("<Leave>", on_leave)
+        
+        if tooltip:
+            self.create_tooltip(btn, tooltip)
+        
+        return btn
+    
+    def create_status_indicators(self, parent):
+        """Cria indicadores de status na toolbar"""
+        # Indicador de linha/coluna
+        self.position_indicator = tk.Label(parent, text="Ln 1, Col 1",
+                                         bg=self.toolbar_bg, fg=self.line_number_fg,
+                                         font=("Arial", 10))
+        self.position_indicator.pack(side=tk.RIGHT, padx=8)
+        
+        # Separador
+        sep = tk.Frame(parent, width=1, bg=self.border_color)
+        sep.pack(side=tk.RIGHT, padx=8, pady=8, fill=tk.Y)
+        
+        # Indicador de tema
+        theme_icon = "🌙" if self.current_theme == "dark" else "☀️"
+        self.theme_indicator = tk.Button(parent, text=theme_icon,
+                                       bg=self.button_bg, fg=self.text_fg,
+                                       bd=0, padx=8, pady=4, font=("Arial", 14),
+                                       relief='flat', cursor='hand2',
+                                       command=self.toggle_theme)
+        self.theme_indicator.pack(side=tk.RIGHT, padx=2)
+        
+        # Hover effect para indicador de tema
+        def on_enter_theme(event):
+            self.theme_indicator.config(bg=self.highlight_bg)
+        
+        def on_leave_theme(event):
+            self.theme_indicator.config(bg=self.button_bg)
+        
+        self.theme_indicator.bind("<Enter>", on_enter_theme)
+        self.theme_indicator.bind("<Leave>", on_leave_theme)
+        self.create_tooltip(self.theme_indicator, "Alternar tema (Ctrl+T)")
+    
+    def toggle_theme(self):
+        """Alterna entre tema claro e escuro"""
+        new_theme = 'light' if self.current_theme == 'dark' else 'dark'
+        self.switch_theme(new_theme)
+        
+        # Atualizar ícone do tema
+        theme_icon = "🌙" if self.current_theme == "dark" else "☀️"
+        self.theme_indicator.config(text=theme_icon)                    
     def create_tooltip(self, widget, text):
         def on_enter(event):
             tooltip = tk.Toplevel()
