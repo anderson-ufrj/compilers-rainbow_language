@@ -1,7 +1,10 @@
 import re
 from enum import Enum, auto
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Optional
+import json
+import os
+from datetime import datetime
 
 # Enum para os tipos de tokens
 class TokenType(Enum):
@@ -68,6 +71,13 @@ class TokenType(Enum):
     # Comentário
     COMENTARIO = auto()
     
+    # Literais de lista
+    ABRE_COLCHETE = auto()
+    FECHA_COLCHETE = auto()
+    
+    # Caracteres especiais em strings
+    ESCAPE_CHAR = auto()
+    
     # Fim de arquivo
     EOF = auto()
 
@@ -80,6 +90,14 @@ class Token:
     
     def __str__(self):
         return f"Linha: {self.linha:02d} - Coluna: {self.coluna:02d} - Token:<{self.tipo.name}, {self.lexema}>"
+    
+    def to_dict(self):
+        return {
+            'tipo': self.tipo.name,
+            'lexema': self.lexema,
+            'linha': self.linha,
+            'coluna': self.coluna
+        }
 
 class AnalisadorLexico:
     def __init__(self):
@@ -113,6 +131,26 @@ class AnalisadorLexico:
         # Limites
         self.MAX_IDENTIFIER_LENGTH = 50
         self.MAX_NUMBER_LENGTH = 20
+        self.MAX_STRING_LENGTH = 1000
+        
+        # Estatísticas
+        self.stats = {
+            'total_linhas': 0,
+            'total_caracteres': 0,
+            'tokens_por_tipo': {},
+            'palavras_reservadas_usadas': set(),
+            'variaveis_declaradas': set()
+        }
+        
+        # Caracteres de escape válidos
+        self.escape_chars = {
+            'n': '\n',
+            't': '\t',
+            'r': '\r',
+            '\\': '\\',
+            '"': '"',
+            '\'': '\''
+        }
         
     def analisar(self, codigo: str) -> Tuple[List[Token], List[str]]:
         tokens = []
@@ -144,12 +182,20 @@ class AnalisadorLexico:
                     i += 1
                     coluna_inicio = coluna
                     coluna += 1
+                    string_content = []
                     
                     while i < len(linha) and linha[i] != '"':
                         if linha[i] == '\\' and i + 1 < len(linha):
+                            escape_char = linha[i + 1]
+                            if escape_char in self.escape_chars:
+                                string_content.append(self.escape_chars[escape_char])
+                            else:
+                                erros.append(f"Linha: {num_linha:02d} - Coluna: {coluna + 1:02d} - Erro: Caractere de escape inválido '\\{escape_char}'")
+                                string_content.append(linha[i:i+2])
                             i += 2
                             coluna += 2
                         else:
+                            string_content.append(linha[i])
                             i += 1
                             coluna += 1
                     
@@ -160,6 +206,10 @@ class AnalisadorLexico:
                     i += 1  # Pular a aspa de fechamento
                     coluna += 1
                     lexema = linha[inicio:i]
+                    
+                    if len(lexema) > self.MAX_STRING_LENGTH:
+                        erros.append(f"Linha: {num_linha:02d} - Coluna: {coluna_inicio:02d} - Erro: String muito longa (máximo {self.MAX_STRING_LENGTH} caracteres)")
+                    
                     tokens.append(Token(TokenType.TEXTO, lexema, num_linha, coluna_inicio))
                     continue
                 
@@ -221,6 +271,9 @@ class AnalisadorLexico:
                     if len(lexema) > self.MAX_IDENTIFIER_LENGTH:
                         erros.append(f"Linha: {num_linha:02d} - Coluna: {coluna_inicio:02d} - Erro: Nome de variável muito longo: {lexema[:20]}...")
                     
+                    # Adicionar variável às estatísticas
+                    self.stats['variaveis_declaradas'].add(lexema)
+                    
                     tokens.append(Token(TokenType.VARIAVEL, lexema, num_linha, coluna_inicio))
                     continue
                 
@@ -252,6 +305,8 @@ class AnalisadorLexico:
                     ')': TokenType.FECHA_PARENTESES,
                     '{': TokenType.ABRE_CHAVES,
                     '}': TokenType.FECHA_CHAVES,
+                    '[': TokenType.ABRE_COLCHETE,
+                    ']': TokenType.FECHA_COLCHETE,
                     '.': TokenType.FIM_LINHA,
                     ',': TokenType.VIRGULA
                 }
@@ -284,7 +339,10 @@ class AnalisadorLexico:
                     lexema = linha[inicio:i]
                     
                     if lexema in self.palavras_reservadas:
-                        tokens.append(Token(self.palavras_reservadas[lexema], lexema, num_linha, coluna_inicio))
+                        tipo_token = self.palavras_reservadas[lexema]
+                        tokens.append(Token(tipo_token, lexema, num_linha, coluna_inicio))
+                        # Adicionar às estatísticas
+                        self.stats['palavras_reservadas_usadas'].add(lexema)
                     else:
                         erros.append(f"Linha: {num_linha:02d} - Coluna: {coluna_inicio:02d} - Erro: Identificador inválido: {lexema}")
                     continue
@@ -301,7 +359,93 @@ class AnalisadorLexico:
         # Adicionar token EOF
         tokens.append(Token(TokenType.EOF, '', len(linhas), len(linhas[-1]) + 1 if linhas else 1))
         
+        # Atualizar estatísticas
+        self.stats['total_linhas'] = len(linhas)
+        self.stats['total_caracteres'] = sum(len(linha) for linha in linhas)
+        
+        # Contar tokens por tipo
+        for token in tokens:
+            tipo = token.tipo.name
+            self.stats['tokens_por_tipo'][tipo] = self.stats['tokens_por_tipo'].get(tipo, 0) + 1
+        
         return tokens, erros
+    
+    def gerar_relatorio_tokens(self, tokens: List[Token], arquivo_saida: str):
+        """Gera arquivo .tokens com a listagem de tokens"""
+        with open(arquivo_saida, 'w', encoding='utf-8') as f:
+            f.write("=== RELATÓRIO DE TOKENS ===\n")
+            f.write(f"Gerado em: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+            
+            for token in tokens:
+                if token.tipo != TokenType.EOF:
+                    f.write(f"{token}\n")
+            
+            f.write(f"\n=== RESUMO ===\n")
+            f.write(f"Total de tokens: {len(tokens) - 1}\n")  # -1 para excluir EOF
+            f.write(f"Total de linhas: {self.stats['total_linhas']}\n")
+            f.write(f"Total de caracteres: {self.stats['total_caracteres']}\n")
+    
+    def gerar_relatorio_erros(self, erros: List[str], arquivo_saida: str):
+        """Gera arquivo .errors com os erros encontrados"""
+        with open(arquivo_saida, 'w', encoding='utf-8') as f:
+            f.write("=== RELATÓRIO DE ERROS ===\n")
+            f.write(f"Gerado em: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+            
+            if erros:
+                for erro in erros:
+                    f.write(f"{erro}\n")
+            else:
+                f.write("Nenhum erro encontrado!\n")
+            
+            f.write(f"\n=== RESUMO ===\n")
+            f.write(f"Total de erros: {len(erros)}\n")
+    
+    def gerar_relatorio_estatisticas(self, tokens: List[Token], erros: List[str], arquivo_saida: str):
+        """Gera relatório detalhado de estatísticas"""
+        with open(arquivo_saida, 'w', encoding='utf-8') as f:
+            f.write("=== ESTATÍSTICAS DA ANÁLISE LÉXICA ===\n")
+            f.write(f"Gerado em: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+            
+            f.write("=== MÉTRICAS GERAIS ===\n")
+            f.write(f"Total de linhas: {self.stats['total_linhas']}\n")
+            f.write(f"Total de caracteres: {self.stats['total_caracteres']}\n")
+            f.write(f"Total de tokens: {len(tokens) - 1}\n")
+            f.write(f"Total de erros: {len(erros)}\n")
+            f.write(f"Taxa de erro: {len(erros) / max(1, len(tokens) - 1) * 100:.2f}%\n\n")
+            
+            f.write("=== DISTRIBUIÇÃO DE TOKENS ===\n")
+            for tipo, count in sorted(self.stats['tokens_por_tipo'].items()):
+                if tipo != 'EOF':
+                    f.write(f"{tipo}: {count}\n")
+            
+            f.write(f"\n=== PALAVRAS RESERVADAS UTILIZADAS ===\n")
+            for palavra in sorted(self.stats['palavras_reservadas_usadas']):
+                f.write(f"- {palavra}\n")
+            
+            f.write(f"\n=== VARIÁVEIS DECLARADAS ===\n")
+            for var in sorted(self.stats['variaveis_declaradas']):
+                f.write(f"- {var}\n")
+    
+    def exportar_json(self, tokens: List[Token], erros: List[str], arquivo_saida: str):
+        """Exporta análise em formato JSON"""
+        # Converter sets para listas para serialização JSON
+        stats_serializavel = self.stats.copy()
+        stats_serializavel['palavras_reservadas_usadas'] = list(self.stats['palavras_reservadas_usadas'])
+        stats_serializavel['variaveis_declaradas'] = list(self.stats['variaveis_declaradas'])
+        
+        resultado = {
+            'metadata': {
+                'timestamp': datetime.now().isoformat(),
+                'total_tokens': len(tokens) - 1,
+                'total_erros': len(erros),
+                'estatisticas': stats_serializavel
+            },
+            'tokens': [token.to_dict() for token in tokens if token.tipo != TokenType.EOF],
+            'erros': erros
+        }
+        
+        with open(arquivo_saida, 'w', encoding='utf-8') as f:
+            json.dump(resultado, f, ensure_ascii=False, indent=2)
 
 # Função principal para testar
 def main():
@@ -365,16 +509,6 @@ def main():
             print(f"Erro ao ler arquivo: {e}")
             return
     
-    try:
-        with open(arquivo, 'r', encoding='utf-8') as f:
-            codigo = f.read()
-    except FileNotFoundError:
-        print(f"Erro: Arquivo '{arquivo}' não encontrado")
-        return
-    except Exception as e:
-        print(f"Erro ao ler arquivo: {e}")
-        return
-    
     analisador = AnalisadorLexico()
     tokens, erros = analisador.analisar(codigo)
     
@@ -401,6 +535,30 @@ def main():
     print(f"Total de tokens: {len(tokens) - 1}")  # -1 para excluir EOF
     print(f"Total de erros: {len(erros)}")
     print("="*80)
+    
+    # Gerar arquivos de saída se foi fornecido um arquivo
+    if len(sys.argv) >= 2:
+        base_name = os.path.splitext(arquivo)[0]
+        
+        # Gerar arquivo .tokens
+        tokens_file = base_name + '.tokens'
+        analisador.gerar_relatorio_tokens(tokens, tokens_file)
+        print(f"\n✅ Arquivo de tokens gerado: {tokens_file}")
+        
+        # Gerar arquivo .errors
+        errors_file = base_name + '.errors'
+        analisador.gerar_relatorio_erros(erros, errors_file)
+        print(f"✅ Arquivo de erros gerado: {errors_file}")
+        
+        # Gerar arquivo de estatísticas
+        stats_file = base_name + '.stats'
+        analisador.gerar_relatorio_estatisticas(tokens, erros, stats_file)
+        print(f"✅ Arquivo de estatísticas gerado: {stats_file}")
+        
+        # Gerar JSON
+        json_file = base_name + '.json'
+        analisador.exportar_json(tokens, erros, json_file)
+        print(f"✅ Arquivo JSON gerado: {json_file}")
     
     # Perguntar se quer analisar outro código
     if len(sys.argv) < 2:  # Só no modo interativo
