@@ -14,7 +14,6 @@ compilers-rainbow_language/
 ├── docs/
 │   ├── Requisitos Técnicos.md      # Este documento
 │   └── 🌈Rainbow✨ - Compiladores.pdf  # Documentação da linguagem
-├── CLAUDE.md                       # Guia para Claude Code
 ├── README.md                       # Documentação principal
 └── .gitignore                      # Arquivos ignorados pelo git
 ```
