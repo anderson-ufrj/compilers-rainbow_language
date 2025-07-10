@@ -141,6 +141,7 @@ class InterpretadorRainbow:
         var_nome = match.group(1)
         expressao = match.group(2)
         
+        # print(f"DEBUG ASSIGN: {var_nome} = '{expressao}'")
         valor = self.avaliar_expressao(expressao)
         self.variaveis[var_nome] = valor
     
@@ -320,9 +321,11 @@ class InterpretadorRainbow:
                 if nivel == 0:
                     expressao = expressao[1:-1].strip()
         
-        # String literal
+        # String literal (verificar se não tem operadores)
         if expressao.startswith('"') and expressao.endswith('"'):
-            return expressao[1:-1]
+            # Verificar se há operadores fora das aspas
+            if not self._tem_operador_fora_aspas(expressao):
+                return expressao[1:-1]
             
         # Número
         try:
@@ -338,8 +341,8 @@ class InterpretadorRainbow:
         if expressao == "Falso":
             return False
             
-        # Variável
-        if expressao.startswith('#'):
+        # Variável (apenas se não contém operadores)
+        if expressao.startswith('#') and not self._tem_operador_fora_aspas(expressao):
             if expressao in self.variaveis:
                 return self.variaveis[expressao]
             else:
@@ -428,6 +431,16 @@ class InterpretadorRainbow:
             return not self.avaliar_expressao(expressao[4:].strip())
             
         raise Exception(f"Expressão não reconhecida: {expressao}")
+    
+    def _tem_operador_fora_aspas(self, expressao):
+        """Verifica se há operadores fora das aspas"""
+        em_string = False
+        for i, char in enumerate(expressao):
+            if char == '"':
+                em_string = not em_string
+            elif not em_string and char in ['+', '-', '*', '/', '%']:
+                return True
+        return False
     
     def dividir_expressao(self, expressao, operador):
         """Divide expressão respeitando strings entre aspas"""
