@@ -270,7 +270,20 @@ class RainbowIDE:
         # Menu Ajuda
         help_menu = tk.Menu(menubar, tearoff=0, bg=self.button_bg, fg=self.text_fg)
         menubar.add_cascade(label="Ajuda", menu=help_menu)
-        help_menu.add_command(label="Sobre", command=self.show_about)
+        
+        # Submenu Tutoriais
+        tutorials_menu = tk.Menu(help_menu, tearoff=0, bg=self.button_bg, fg=self.text_fg)
+        help_menu.add_cascade(label="📚 Tutoriais", menu=tutorials_menu)
+        tutorials_menu.add_command(label="📖 Guia do Usuário", command=lambda: self.show_documentation("guia-usuario-ide.md"))
+        tutorials_menu.add_command(label="🏗️ Arquitetura do Sistema", command=lambda: self.show_documentation("arquitetura-sistema.md"))
+        tutorials_menu.add_command(label="⚡ Interpretador Rainbow", command=lambda: self.show_documentation("interpretador-rainbow.md"))
+        tutorials_menu.add_command(label="📦 Instalação e Configuração", command=lambda: self.show_documentation("instalacao-configuracao.md"))
+        tutorials_menu.add_command(label="🌈 Linguagem Rainbow", command=lambda: self.show_documentation("linguagem-rainbow.md"))
+        tutorials_menu.add_command(label="📝 Exemplos Rainbow", command=lambda: self.show_documentation("exemplos-rainbow.md"))
+        tutorials_menu.add_command(label="📐 Gramática Rainbow", command=lambda: self.show_documentation("gramatica-rainbow.md"))
+        
+        help_menu.add_separator()
+        help_menu.add_command(label="ℹ️ Sobre", command=self.show_about)
         
     def switch_theme(self, theme_name):
         self.current_theme = theme_name
@@ -914,6 +927,113 @@ class RainbowIDE:
         self.console_text.insert("end", f"{prompt} {resultado[0]}\n")
         
         return resultado[0]
+    def show_documentation(self, filename):
+        """Exibe janela com documentação markdown"""
+        doc_path = os.path.join("docs", filename)
+        
+        if not os.path.exists(doc_path):
+            messagebox.showerror("Erro", f"Arquivo de documentação não encontrado: {filename}")
+            return
+            
+        # Criar janela de documentação
+        doc_window = tk.Toplevel(self.root)
+        doc_window.title(f"📚 {filename.replace('.md', '').replace('-', ' ').title()}")
+        doc_window.geometry("900x700")
+        doc_window.configure(bg=self.bg_color)
+        
+        # Centralizar janela
+        doc_window.transient(self.root)
+        doc_window.grab_set()
+        
+        # Centralizar na tela
+        x = (doc_window.winfo_screenwidth() - 900) // 2
+        y = (doc_window.winfo_screenheight() - 700) // 2
+        doc_window.geometry(f"900x700+{x}+{y}")
+        
+        # Frame principal com scroll
+        main_frame = tk.Frame(doc_window, bg=self.bg_color)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        
+        # Canvas e scrollbar
+        canvas = tk.Canvas(main_frame, bg=self.text_bg, highlightthickness=0)
+        scrollbar = tk.Scrollbar(main_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg=self.text_bg)
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Text widget para exibir markdown
+        text_widget = tk.Text(scrollable_frame, 
+                             bg=self.text_bg, 
+                             fg=self.text_fg,
+                             font=("Consolas", 10),
+                             wrap=tk.WORD,
+                             padx=15,
+                             pady=15,
+                             height=35,
+                             width=100)
+        text_widget.pack(fill=tk.BOTH, expand=True)
+        
+        # Ler e exibir conteúdo markdown
+        try:
+            with open(doc_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                text_widget.insert(tk.END, content)
+                text_widget.config(state=tk.DISABLED)  # Somente leitura
+        except Exception as e:
+            text_widget.insert(tk.END, f"Erro ao carregar documentação: {str(e)}")
+            text_widget.config(state=tk.DISABLED)
+        
+        # Empacotar canvas e scrollbar
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Frame para botões
+        button_frame = tk.Frame(doc_window, bg=self.bg_color)
+        button_frame.pack(fill=tk.X, pady=10)
+        
+        # Botão fechar
+        close_btn = tk.Button(button_frame, text="Fechar", 
+                             command=doc_window.destroy,
+                             bg=self.button_bg, fg=self.text_fg,
+                             font=("Arial", 10),
+                             padx=20, pady=8)
+        close_btn.pack(side=tk.RIGHT, padx=10)
+        
+        # Botão abrir no editor externo
+        def open_external():
+            try:
+                import subprocess
+                import platform
+                
+                if platform.system() == 'Darwin':       # macOS
+                    subprocess.call(('open', doc_path))
+                elif platform.system() == 'Windows':    # Windows
+                    os.startfile(doc_path)
+                else:                                    # Linux
+                    subprocess.call(('xdg-open', doc_path))
+            except Exception as e:
+                messagebox.showerror("Erro", f"Não foi possível abrir arquivo: {str(e)}")
+        
+        external_btn = tk.Button(button_frame, text="📝 Abrir no Editor", 
+                                command=open_external,
+                                bg=self.button_bg, fg=self.text_fg,
+                                font=("Arial", 10),
+                                padx=20, pady=8)
+        external_btn.pack(side=tk.RIGHT, padx=5)
+        
+        # Habilitar scroll com mouse
+        def on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        
+        canvas.bind("<MouseWheel>", on_mousewheel)  # Windows
+        canvas.bind("<Button-4>", lambda e: canvas.yview_scroll(-1, "units"))  # Linux
+        canvas.bind("<Button-5>", lambda e: canvas.yview_scroll(1, "units"))   # Linux
         
     def show_about(self):
         about_window = tk.Toplevel(self.root)
