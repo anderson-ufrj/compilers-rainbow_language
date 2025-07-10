@@ -29,12 +29,12 @@ class RainbowSplashScreen:
         self.messages = [
             ("Estabelecendo as cores do arco-íris...", "#FF0000"),
             ("Convidando o analisador léxico...", "#FF7F00"),
-            ("Despertando a gramática...", "#FFFF00"),
+            ("Despertando a gramática...", "#FF7F00"),  # Laranja ao invés de amarelo
             ("Preparando tokens encantados...", "#00FF00"),
             ("Inicializando a semântica...", "#0000FF"),
             ("Carregando símbolos místicos...", "#4B0082"),
             ("Chamando todos os unicórnios disponíveis...", "#9400D3"),
-            ("Pronto para compilar magia.", "#FF1493")
+            ("Unicórnios encontrados, entrando no vale!", "#FF1493")
         ]
         
     def create_background_image(self):
@@ -120,19 +120,19 @@ class RainbowSplashScreen:
         # Título Rainbow - todas as letras em preto exceto R em violeta
         title_text = "RAINBOW"
         
-        # Criar cada letra
+        # Criar cada letra com melhor espaçamento
         self.title_letters = []
-        letter_width = 35  # Largura aproximada de cada letra
+        letter_width = 55  # Aumentar espaçamento entre letras
         start_x = center_x - (len(title_text) * letter_width) // 2
         
         for i, letter in enumerate(title_text):
-            x_pos = start_x + (i * letter_width)
+            x_pos = start_x + (i * letter_width) + letter_width // 2
             # Primeira letra (R) em violeta, resto em preto
             color = "#9400D3" if i == 0 else "#000000"
             
             letter_obj = self.canvas.create_text(x_pos, center_y,
                                                text=letter,
-                                               font=("Impact", 48, "bold"),
+                                               font=("Arial Black", 52, "bold"),
                                                fill=color,
                                                state='hidden')
             self.title_letters.append(letter_obj)
