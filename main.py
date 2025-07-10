@@ -865,299 +865,149 @@ class RainbowIDE:
         if self.modified:
             self.save_file()
             
-        # Abrir executor visual
-        self.open_visual_executor()
+        # Executar no console integrado
+        self.run_integrated_executor()
     
-    def open_visual_executor(self):
-        """Abre o executor visual"""
-        executor_window = tk.Toplevel(self.root)
-        executor_window.title("🚀 Executor Rainbow")
-        executor_window.geometry("700x500")
-        executor_window.configure(bg=self.bg_color)
+    def run_integrated_executor(self):
+        """Executa programa no console integrado da IDE"""
+        # Limpar console e mostrar na aba
+        self.console_text.delete("1.0", "end")
+        self.notebook.select(self.console_frame)
         
-        # Centralizar janela
-        executor_window.transient(self.root)
+        # Adicionar campo de entrada no console se não existir
+        if not hasattr(self, 'console_input_frame'):
+            self.setup_console_input()
         
-        x = (executor_window.winfo_screenwidth() - 700) // 2
-        y = (executor_window.winfo_screenheight() - 500) // 2
-        executor_window.geometry(f"700x500+{x}+{y}")
+        # Mostrar início da execução
+        self.console_text.insert("end", "🌈 Executando programa Rainbow...\n")
+        self.console_text.insert("end", "=" * 50 + "\n\n")
+        self.console_text.see("end")
         
-        # Frame principal
-        main_frame = tk.Frame(executor_window, bg=self.bg_color)
-        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-        # Título
-        title_label = tk.Label(main_frame, text="🌈 Executando Programa Rainbow", 
-                              font=("Arial", 16, "bold"), 
-                              bg=self.bg_color, fg=self.text_fg)
-        title_label.pack(pady=(0, 10))
-        
-        # Frame para saída
-        output_frame = tk.Frame(main_frame, bg=self.bg_color)
-        output_frame.pack(fill=tk.BOTH, expand=True)
-        
-        # Console de saída
-        output_text = tk.Text(output_frame, 
-                             bg=self.text_bg, 
-                             fg=self.text_fg,
-                             font=("Consolas", 11),
-                             wrap=tk.WORD,
-                             padx=10,
-                             pady=10)
-        
-        scrollbar = tk.Scrollbar(output_frame, orient="vertical", command=output_text.yview)
-        output_text.configure(yscrollcommand=scrollbar.set)
-        
-        output_text.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-        
-        # Frame para entrada
-        input_frame = tk.Frame(main_frame, bg=self.bg_color)
-        input_frame.pack(fill=tk.X, pady=(10, 0))
-        
-        # Campo de entrada (inicialmente oculto)
-        input_label = tk.Label(input_frame, text="", 
-                              bg=self.bg_color, fg=self.text_fg,
-                              font=("Arial", 10))
-        
-        input_entry = tk.Entry(input_frame, 
-                              bg=self.text_bg, fg=self.text_fg,
-                              font=("Arial", 11),
-                              insertbackground=self.text_fg)
-        
-        input_button = tk.Button(input_frame, text="Enviar",
-                                bg=self.button_bg, fg=self.text_fg,
-                                font=("Arial", 10))
-        
-        # Inicialmente ocultos
-        input_label.pack_forget()
-        input_entry.pack_forget()
-        input_button.pack_forget()
-        
-        # Frame para botões
-        button_frame = tk.Frame(main_frame, bg=self.bg_color)
-        button_frame.pack(fill=tk.X, pady=(10, 0))
-        
-        # Botão executar
-        execute_btn = tk.Button(button_frame, text="▶️ Executar",
-                               command=lambda: self._execute_in_visual(output_text, input_label, input_entry, input_button, execute_btn),
-                               bg=self.button_bg, fg=self.text_fg,
-                               font=("Arial", 10, "bold"),
-                               padx=20, pady=5)
-        execute_btn.pack(side=tk.LEFT)
-        
-        # Botão limpar
-        clear_btn = tk.Button(button_frame, text="🗑️ Limpar",
-                             command=lambda: output_text.delete("1.0", "end"),
-                             bg=self.button_bg, fg=self.text_fg,
-                             font=("Arial", 10),
-                             padx=20, pady=5)
-        clear_btn.pack(side=tk.LEFT, padx=(5, 0))
-        
-        # Botão fechar
-        close_btn = tk.Button(button_frame, text="❌ Fechar",
-                             command=executor_window.destroy,
-                             bg=self.button_bg, fg=self.text_fg,
-                             font=("Arial", 10),
-                             padx=20, pady=5)
-        close_btn.pack(side=tk.RIGHT)
-        
-        # Salvar referências para o callback
-        self.executor_widgets = {
-            'window': executor_window,
-            'output': output_text,
-            'input_label': input_label,
-            'input_entry': input_entry,
-            'input_button': input_button,
-            'input_frame': input_frame,
-            'pending_input': None,
-            'input_event': None
-        }
+        # Executar em thread separada
+        thread = threading.Thread(target=self._run_integrated_thread)
+        thread.daemon = True
+        thread.start()
     
-    def _execute_in_visual(self, output_text, input_label, input_entry, input_button, execute_btn):
-        """Executa programa no executor visual"""
-        # Desabilitar botão de executar
-        execute_btn.config(state=tk.DISABLED, text="⏳ Executando...")
+    def setup_console_input(self):
+        """Configura entrada interativa no console"""
+        # Frame para entrada (inicialmente oculto)
+        self.console_input_frame = tk.Frame(self.console_frame, bg=self.bg_color)
         
-        # Limpar saída
-        output_text.delete("1.0", "end")
-        output_text.insert("end", "🌈 Iniciando execução...\n\n")
-        output_text.update()
+        # Label para prompt
+        self.console_input_label = tk.Label(self.console_input_frame, 
+                                           text="", 
+                                           bg=self.bg_color, 
+                                           fg=self.text_fg,
+                                           font=("Arial", 10))
         
-        # Inicializar sistema de entrada
-        self.executor_widgets['pending_input'] = None
-        self.executor_widgets['input_event'] = None
+        # Campo de entrada
+        self.console_input_entry = tk.Entry(self.console_input_frame,
+                                           bg=self.text_bg,
+                                           fg=self.text_fg,
+                                           font=("Arial", 11),
+                                           insertbackground=self.text_fg)
         
-        # Configurar entrada visual
-        def handle_input():
-            valor = input_entry.get()
-            input_entry.delete(0, tk.END)
+        # Botão enviar
+        self.console_input_button = tk.Button(self.console_input_frame,
+                                             text="Enviar",
+                                             bg=self.button_bg,
+                                             fg=self.text_fg,
+                                             font=("Arial", 10),
+                                             command=self.handle_console_input)
+        
+        # Bind Enter
+        self.console_input_entry.bind('<Return>', lambda e: self.handle_console_input())
+        
+        # Variáveis de controle
+        self.console_input_event = None
+        self.console_input_result = None
+        
+        # Layout (inicialmente oculto)
+        self.console_input_label.pack(pady=(5, 0))
+        self.console_input_entry.pack(fill=tk.X, padx=5, pady=2)
+        self.console_input_button.pack(pady=(2, 5))
+    
+    def handle_console_input(self):
+        """Manipula entrada do usuário no console"""
+        if self.console_input_event:
+            valor = self.console_input_entry.get()
+            self.console_input_entry.delete(0, tk.END)
+            
+            # Mostrar entrada no console
+            self.console_text.insert("end", f"➤ {valor}\n\n")
+            self.console_text.see("end")
             
             # Ocultar campos de entrada
-            input_label.pack_forget()
-            input_entry.pack_forget()
-            input_button.pack_forget()
+            self.console_input_frame.pack_forget()
             
-            # Mostrar valor na saída
-            output_text.insert("end", f"➤ {valor}\n\n")
-            output_text.see("end")
-            output_text.update()
-            
-            # Sinalizar que a entrada foi recebida
-            if self.executor_widgets.get('input_event'):
-                self.executor_widgets['pending_input'] = valor
-                self.executor_widgets['input_event'].set()
-        
-        def on_enter(event):
-            handle_input()
-        
-        input_button.config(command=handle_input)
-        input_entry.bind('<Return>', on_enter)
-        
-        # DEBUG: Testar primeiro sem threading
-        try:
-            # Mostrar debug
-            output_text.insert("end", "DEBUG: Testando execução...\n")
-            output_text.update()
-            
-            # Importar interpretador
-            sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
-            from interpretador_rainbow import InterpretadorRainbow
-            
-            output_text.insert("end", "DEBUG: Interpretador importado...\n")
-            output_text.update()
-            
-            # Criar interpretador - usar dialog temporariamente
-            def entrada_simples(prompt):
-                valor = tk.simpledialog.askstring("Entrada", prompt, parent=self.root)
-                output_text.insert("end", f"🔸 {prompt} {valor}\n")
-                output_text.update()
-                return valor or ""
-            
-            interpretador = InterpretadorRainbow(ide_callback=entrada_simples)
-            
-            output_text.insert("end", "DEBUG: Executando arquivo...\n")
-            output_text.update()
-            
-            # Executar
-            sucesso, resultado = interpretador.executar_arquivo(self.current_file)
-            
-            # Mostrar resultado
-            if sucesso:
-                output_text.insert("end", f"\n🟢 SAÍDA DO PROGRAMA:\n{resultado}\n")
-                output_text.insert("end", "\n✅ Sucesso!\n")
-            else:
-                output_text.insert("end", f"\n🔴 ERRO:\n{resultado}\n")
-                self.highlight_error_line(resultado)
-                
-        except Exception as e:
-            output_text.insert("end", f"\n💥 EXCEÇÃO: {str(e)}\n")
-            output_text.insert("end", f"Tipo: {type(e).__name__}\n")
-            import traceback
-            output_text.insert("end", f"Traceback:\n{traceback.format_exc()}\n")
-        
-        finally:
-            execute_btn.config(state=tk.NORMAL, text="▶️ Executar")
-            output_text.see("end")
+            # Sinalizar resultado
+            self.console_input_result = valor
+            self.console_input_event.set()
     
-    def _execute_visual_thread(self, output_text, execute_btn):
-        """Thread para executar no executor visual"""
+    def _run_integrated_thread(self):
+        """Thread para executar no console integrado"""
         try:
-            # Mostrar início da execução
-            def show_start():
-                output_text.insert("end", "Compilando arquivo...\n")
-                output_text.see("end")
-                output_text.update()
-            
-            self.root.after(0, show_start)
-            
             # Importar interpretador
             sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
             from interpretador_rainbow import InterpretadorRainbow
             
-            # Mostrar status
-            def show_interpreting():
-                output_text.insert("end", "Iniciando interpretação...\n\n")
-                output_text.see("end")
-                output_text.update()
-            
-            self.root.after(0, show_interpreting)
-            
-            # Criar interpretador com callback visual
-            interpretador = InterpretadorRainbow(ide_callback=self.solicitar_entrada_visual)
+            # Criar interpretador com callback do console
+            interpretador = InterpretadorRainbow(ide_callback=self.solicitar_entrada_console)
             
             # Executar
             sucesso, resultado = interpretador.executar_arquivo(self.current_file)
             
-            # Atualizar interface na thread principal
-            def update_ui():
+            # Mostrar resultado na thread principal
+            def mostrar_resultado():
                 if sucesso:
                     # Mostrar saída do programa
-                    linhas_saida = resultado.split('\n')
-                    for linha in linhas_saida:
+                    linhas = resultado.split('\n')
+                    for linha in linhas:
                         if linha.strip():
-                            output_text.insert("end", f"{linha}\n")
+                            self.console_text.insert("end", f"{linha}\n")
                     
-                    output_text.insert("end", "\n✅ Programa executado com sucesso!\n")
+                    self.console_text.insert("end", "\n" + "=" * 50 + "\n")
+                    self.console_text.insert("end", "✅ Programa executado com sucesso!\n")
                 else:
-                    output_text.insert("end", f"❌ Erro: {resultado}\n")
-                    # Destacar linha com erro no editor principal
+                    self.console_text.insert("end", f"\n❌ Erro: {resultado}\n")
                     self.highlight_error_line(resultado)
                 
-                output_text.see("end")
-                execute_btn.config(state=tk.NORMAL, text="▶️ Executar")
+                self.console_text.see("end")
+                self.status_bar.config(text="Execução finalizada")
             
-            self.root.after(0, update_ui)
+            self.root.after(0, mostrar_resultado)
             
         except Exception as e:
-            def show_error():
-                output_text.insert("end", f"❌ Erro inesperado: {str(e)}\n")
-                output_text.insert("end", f"Detalhes: {type(e).__name__}\n")
-                self.highlight_error_line(str(e))
-                output_text.see("end")
-                execute_btn.config(state=tk.NORMAL, text="▶️ Executar")
+            def mostrar_erro():
+                self.console_text.insert("end", f"\n❌ Erro na execução: {str(e)}\n")
+                self.console_text.see("end")
+                self.status_bar.config(text="Erro na execução")
             
-            self.root.after(0, show_error)
+            self.root.after(0, mostrar_erro)
     
-    def solicitar_entrada_visual(self, prompt):
-        """Solicita entrada no executor visual"""
-        if not hasattr(self, 'executor_widgets'):
-            # Fallback para dialog se não houver executor visual
-            return tk.simpledialog.askstring("Entrada", prompt, parent=self.root) or ""
-        
+    def solicitar_entrada_console(self, prompt):
+        """Solicita entrada do usuário no console integrado"""
         resultado = [None]
         evento = threading.Event()
         
-        def mostrar_entrada():
-            try:
-                # Mostrar prompt na saída
-                self.executor_widgets['output'].insert("end", f"📝 {prompt}\n")
-                self.executor_widgets['output'].see("end")
-                self.executor_widgets['output'].update()
-                
-                # Mostrar campos de entrada
-                self.executor_widgets['input_label'].config(text=prompt)
-                self.executor_widgets['input_label'].pack(pady=(5, 0))
-                self.executor_widgets['input_entry'].pack(fill=tk.X, pady=5)
-                self.executor_widgets['input_button'].pack()
-                
-                # Focar no campo de entrada
-                self.executor_widgets['input_entry'].focus_set()
-                
-                # Configurar evento
-                self.executor_widgets['input_event'] = evento
-                
-            except Exception as e:
-                print(f"Erro ao mostrar entrada: {e}")
-                # Fallback para dialog
-                valor = tk.simpledialog.askstring("Entrada", prompt, parent=self.root) or ""
-                resultado[0] = valor
-                evento.set()
+        def mostrar_prompt():
+            # Mostrar prompt no console
+            self.console_text.insert("end", f"📝 {prompt}\n")
+            self.console_text.see("end")
+            
+            # Mostrar campos de entrada
+            self.console_input_label.config(text=prompt)
+            self.console_input_frame.pack(fill=tk.X, padx=10, pady=5)
+            self.console_input_entry.focus_set()
+            
+            # Configurar evento
+            self.console_input_event = evento
+            self.console_input_result = None
         
-        self.root.after(0, mostrar_entrada)
+        self.root.after(0, mostrar_prompt)
         evento.wait()  # Aguardar entrada
         
-        return self.executor_widgets.get('pending_input', "") or resultado[0] or ""
+        return self.console_input_result or ""
     
     def highlight_error_line(self, error_message):
         """Destaca linha com erro no editor"""
