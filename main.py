@@ -1235,7 +1235,7 @@ class RainbowIDE:
         self.run_analysis("src/compilador_rainbow.py", "Compilação Completa")
         
     def run_program(self):
-        """Executa o programa Rainbow"""
+        """Executa o programa Rainbow após compilação completa"""
         if not self.current_file:
             messagebox.showwarning("Aviso", "Salve o arquivo antes de executar!")
             return
@@ -1243,8 +1243,61 @@ class RainbowIDE:
         if self.modified:
             self.save_file()
             
-        # Executar no console integrado
-        self.run_integrated_executor()
+        # Primeiro executar compilação completa para popular as abas
+        self.run_full_before_execution()
+    
+    def run_full_before_execution(self):
+        """Executa compilação completa e depois executa o programa"""
+        # Limpar saídas anteriores
+        self.clear_outputs()
+        
+        # Executar compilação em thread separada
+        thread = threading.Thread(target=self._run_full_then_execute_thread)
+        thread.daemon = True
+        thread.start()
+    
+    def _run_full_then_execute_thread(self):
+        """Thread para executar compilação completa seguida da execução"""
+        try:
+            # Atualizar status
+            self.status_bar.config(text="Compilando programa...")
+            
+            # Executar o compilador completo
+            cmd = [sys.executable, "src/compilador_rainbow.py", self.current_file]
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                     text=True, cwd=os.path.dirname(os.path.abspath(__file__)))
+            
+            stdout, stderr = process.communicate()
+            
+            # Carregar arquivos de saída na thread principal
+            def carregar_e_executar():
+                # Carregar todas as análises nas abas
+                self.load_output_files()
+                
+                # Verificar se houve erros críticos na compilação
+                errors_content = self.errors_text.get("1.0", "end-1c").strip()
+                
+                if process.returncode == 0 or "Nenhum erro encontrado" in errors_content:
+                    # Compilação bem-sucedida, executar programa
+                    self.status_bar.config(text="Compilação concluída. Executando programa...")
+                    # Pequena pausa para mostrar as abas
+                    self.root.after(1000, self.run_integrated_executor)
+                else:
+                    # Erros críticos na compilação
+                    self.status_bar.config(text="Compilação falhou. Verifique os erros.")
+                    self.notebook.select(self.errors_frame)
+                    
+                # Destacar erros no editor
+                self.highlight_errors()
+            
+            self.root.after(0, carregar_e_executar)
+            
+        except Exception as e:
+            def mostrar_erro():
+                self.console_text.insert("end", f"Erro na compilação: {str(e)}\n", "error")
+                self.status_bar.config(text="Erro na compilação")
+            
+            self.root.after(0, mostrar_erro)
     
     def run_integrated_executor(self):
         """Executa programa no console integrado da IDE"""
