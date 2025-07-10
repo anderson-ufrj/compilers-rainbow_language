@@ -1,42 +1,47 @@
-# 🌈 Compilador Rainbow
+# 🌈 Rainbow IDE & Compilador
 
 <div align="center">
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)
-![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Completo-success?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-Academic-green?style=for-the-badge)
 
+Uma IDE completa e compilador para a linguagem de programação Rainbow, desenvolvido para fins educacionais.
 
-Um compilador educacional para a linguagem Rainbow, uma linguagem de programação em português projetada para fins didáticos.
+**🎓 Projeto Acadêmico - Disciplina de Compiladores**
+*IFSULDEMINAS Campus Muzambinho | Professor: Hudson*
 
 </div>
 
 ## 📋 Sobre o Projeto
 
-O Compilador Rainbow é um projeto acadêmico que implementa as fases de compilação para a linguagem Rainbow.
+O Rainbow IDE é um ambiente de desenvolvimento integrado completo para a linguagem Rainbow, uma linguagem de programação com sintaxe em português projetada para fins didáticos e educacionais.
+
 ### 🎯 Objetivos
 
-- Criar um compilador didático completo para ensino de compiladores
-- Implementar uma linguagem de programação com sintaxe em português
-- Demonstrar as fases clássicas de compilação
-- Fornecer mensagens de erro claras e educativas
+- Implementar todas as fases de um compilador educacional
+- Criar uma IDE moderna e intuitiva para desenvolvimento
+- Demonstrar conceitos de compilação de forma prática
+- Fornecer interpretador integrado para execução de programas
+- Facilitar o aprendizado de programação em português
 
 ### 📊 Status do Desenvolvimento
 
-| Fase | Status | Descrição |
-|------|--------|-----------|
-| Análise Léxica | ✅ Completo | Scanner implementado e testado |
-| Análise Sintática | 🚧 Planejado | Parser para construção da AST |
-| Análise Semântica | 📅 Futuro | Verificação de tipos e escopo |
-| Geração de Código | 📅 Futuro | Geração de código intermediário |
-| Interface Gráfica | 📅 Futuro | GUI em Tkinter |
+| Componente | Status | Descrição |
+|------------|--------|-----------|
+| **Rainbow IDE** | ✅ **Completo** | Interface gráfica moderna com temas |
+| **Análise Léxica** | ✅ **Completo** | Tokenização com detecção de erros |
+| **Análise Sintática** | ✅ **Completo** | Parser com construção de AST |
+| **Análise Semântica** | ✅ **Completo** | Verificação de tipos e escopo |
+| **Interpretador** | ✅ **Completo** | Execução interativa de programas |
+| **Exemplos** | ✅ **Completo** | 7 programas demonstrativos |
 
 ## 🚀 Começando
 
 ### Pré-requisitos
 
 - Python 3.10 ou superior
-- Terminal/Console para execução
+- Tkinter (geralmente incluído com Python)
 
 ### Instalação
 
@@ -46,53 +51,52 @@ git clone https://github.com/anderson-ufrj/compilers-rainbow_language
 cd compilers-rainbow_language
 ```
 
-2. Execute o analisador léxico:
+2. Execute a Rainbow IDE:
 ```bash
-python3 src/analisador_lexico.py
+python3 main.py
+# ou
+./run.sh  # (no Linux/macOS)
 ```
 
-## 💻 Uso
+## 💻 Usando a Rainbow IDE
 
-### Análise Léxica
+### 🖥️ Interface Principal
 
-Para analisar um arquivo `.rainbow`:
+A Rainbow IDE oferece uma experiência moderna de desenvolvimento:
 
-```bash
-python3 src/analisador_lexico.py arquivo.rainbow
-```
+- **Editor com Syntax Highlighting** - Cores automáticas para código Rainbow
+- **Sistema de Temas** - Modo claro e escuro (menu Visualizar → Tema)
+- **Análise em Tempo Real** - Validação léxica, sintática e semântica
+- **Interpretador Integrado** - Execute programas diretamente na IDE
+- **Console Interativo** - Entrada e saída em tempo real
+- **Exemplos Inclusos** - 7 programas prontos para aprender
 
-Para modo interativo (digite código Rainbow diretamente):
+### ⚡ Funcionalidades Principais
 
-```bash
-python3 src/analisador_lexico.py
-```
+| Funcionalidade | Atalho | Descrição |
+|----------------|--------|-----------|
+| **Executar Programa** | `Ctrl+R` ou ▶️ | Executa o código atual |
+| **Novo Arquivo** | `Ctrl+N` | Cria novo arquivo Rainbow |
+| **Abrir Arquivo** | `Ctrl+O` | Abre arquivo .rainbow |
+| **Salvar** | `Ctrl+S` | Salva arquivo atual |
+| **Análise Léxica** | `F5` | Apenas análise léxica |
+| **Análise Sintática** | `F6` | Análise léxica + sintática |
+| **Análise Semântica** | `F7` | Análise completa |
+| **Compilação Completa** | `F8` | Todas as análises |
 
-### Arquivos de Teste
+### 📚 Exemplos Inclusos
 
-O projeto inclui três arquivos de teste cuidadosamente elaborados:
+Acesse via menu **Exemplos**:
 
-| Arquivo | Propósito | Características |
-|---------|-----------|-----------------|
-| `tests/teste1.rainbow` | Validação básica | I/O, condicionais, loops |
-| `tests/teste2.rainbow` | Detecção de erros | Erros léxicos intencionais |
-| `tests/teste3.rainbow` | Teste completo | Todos os tokens e operadores |
-
-### Executando os Testes
-
-```bash
-# Testar programa válido
-python3 src/analisador_lexico.py tests/teste1.rainbow
-
-# Testar detecção de erros
-python3 src/analisador_lexico.py tests/teste2.rainbow
-
-# Testar funcionalidades completas
-python3 src/analisador_lexico.py tests/teste3.rainbow
-```
+1. **👋 Olá Mundo** - Primeiro programa Rainbow
+2. **🧮 Calculadora** - Operações matemáticas básicas
+3. **📊 Tabuada** - Laços de repetição
+4. **🔀 Condicional** - Estruturas se/senao aninhadas
+5. **🔄 Laço Para** - Diferentes tipos de loops
+6. **🏷️ Tipos de Dados** - Demonstração de tipos
+7. **💬 Entrada do Usuário** - Interação com usuário
 
 ## 🌟 Linguagem Rainbow
-
-A Rainbow é uma linguagem de programação educacional com sintaxe completamente em português, projetada para facilitar o aprendizado de programação para falantes nativos da língua portuguesa.
 
 ### Estrutura Básica
 
@@ -107,14 +111,15 @@ As variáveis são prefixadas com `#`:
 ```rainbow
 #nome recebe "João".
 #idade recebe 25.
+#ativo recebe Verdadeiro.
 ```
 
 ### Tipos de Dados
 
-- `cor_numero` - Números inteiros e reais
-- `cor_texto` - Strings de texto
-- `cor_logico` - Valores booleanos (Verdadeiro/Falso)
-- `cor_lista` - Listas de elementos
+- **NUMERO** - Inteiros e decimais (42, 3.14)
+- **TEXTO** - Strings ("Olá mundo")
+- **LOGICO** - Booleanos (Verdadeiro, Falso)
+- **LISTA** - Arrays de elementos
 
 ### Entrada/Saída
 
@@ -136,10 +141,12 @@ se (#idade >= 18) {
 
 **Loops:**
 ```rainbow
+// Laço para com contador
 para #i de 1 ate 10 passo 1 {
     mostrar(#i).
 }
 
+// Laço enquanto
 enquanto (#contador < 10) {
     #contador recebe #contador + 1.
 }
@@ -152,15 +159,9 @@ enquanto (#contador < 10) {
 - **Lógicos**: `E`, `OU`, `NAO`
 - **Atribuição**: `recebe`
 
-### Comentários
-
-```rainbow
-// Este é um comentário de linha
-```
-
 ## 🏗️ Arquitetura
 
-### Componentes Principais
+### Componentes do Sistema
 
 ```mermaid
 graph TD
@@ -169,172 +170,164 @@ graph TD
     C --> D[Analisador Sintático]
     D --> E[AST]
     E --> F[Analisador Semântico]
-    F --> G[AST Anotada]
-    G --> H[Gerador de Código]
-    H --> I[Código Executável]
+    F --> G[Tabela de Símbolos]
+    G --> H[Interpretador]
+    H --> I[Execução]
+    
+    J[Rainbow IDE] --> B
+    J --> D
+    J --> F
+    J --> H
     
     style B fill:#4CAF50,color:#fff
     style D fill:#FFC107,color:#000
     style F fill:#FF5722,color:#fff
-    style H fill:#FF5722,color:#fff
+    style H fill:#2196F3,color:#fff
+    style J fill:#9C27B0,color:#fff
 ```
 
-### Estrutura do Analisador Léxico
-
-```python
-src/analisador_lexico.py
-├── TokenType (Enum)           # 30+ tipos de tokens definidos
-├── Token (Class)              # Estrutura: tipo, lexema, linha, coluna
-├── AnalisadorLexico (Class)   # Scanner com detecção de erros
-│   ├── __init__()            # Inicialização e criação de arquivos teste
-│   ├── analisar()            # Loop principal de análise
-│   ├── processar_*()         # Métodos especializados por tipo
-│   └── adicionar_erro()      # Sistema de recuperação de erros
-└── main()                    # CLI interativa
-```
-
-### Características Técnicas
-
-- **Análise caractere por caractere** com lookahead
-- **Recuperação de erros** - continua análise após erros
-- **Rastreamento preciso** de linha e coluna
-- **Validação contextual** de tokens
-- **Limites configuráveis** para identificadores e números
-
-## 📁 Estrutura do Projeto
+### Estrutura de Arquivos
 
 ```
 compilers-rainbow_language/
+├── main.py                    # Rainbow IDE (interface principal)
+├── run.sh                     # Script de execução
 ├── src/
-│   └── analisador_lexico.py
+│   ├── analisador_lexico.py      # Análise léxica
+│   ├── analisador_sintatico.py   # Análise sintática
+│   ├── analisador_semantico.py   # Análise semântica
+│   ├── interpretador_rainbow.py  # Interpretador
+│   └── compilador_rainbow.py     # Integrador principal
+├── exemplos/
+│   ├── ola_mundo.rainbow         # Exemplo básico
+│   ├── calculadora.rainbow       # Operações matemáticas
+│   ├── tabuada.rainbow           # Laços de repetição
+│   ├── condicional.rainbow       # Estruturas condicionais
+│   ├── laco_para.rainbow         # Laços para
+│   ├── tipos_dados.rainbow       # Tipos de dados
+│   └── entrada_usuario.rainbow   # Entrada interativa
 ├── tests/
-│   ├── teste1.rainbow
-│   ├── teste2.rainbow
-│   └── teste3.rainbow
-├── docs/
-│   ├── Requisitos Técnicos.md
-│   └── 🌈Rainbow✨ - Compiladores.pdf
-├── README.md
-└── .gitignore
+│   ├── teste1.rainbow            # Programa válido
+│   ├── teste2.rainbow            # Detecção de erros
+│   └── teste3.rainbow            # Teste completo
+└── docs/
+    └── [documentação técnica]
 ```
+
+## 👨‍💻 Desenvolvedores
+
+**Projeto desenvolvido para a disciplina de Compiladores**
+
+- **👤 Anderson Henrique da Silva**
+- **👤 Lurian Letícia dos Reis**
+
+**📚 Orientação**
+- **Professor:** Hudson
+- **Instituição:** IFSULDEMINAS Campus Muzambinho
 
 ## 🛠️ Desenvolvimento
 
-### Ferramentas e Tecnologias
+### Tecnologias Utilizadas
 
-- **Linguagem**: Python 3.10+
-- **IDE Recomendada**: PyCharm, VS Code
-- **IA Assistant**: [Claude Code](https://claude.ai/code) - Utilizado para acelerar desenvolvimento e garantir qualidade
-- **Controle de Versão**: Git
+- **Python 3.10+** - Linguagem principal
+- **Tkinter** - Interface gráfica
+- **Threading** - Execução assíncrona
+- **JSON** - Saída estruturada
+- **RegEx** - Análise de padrões
 
-### Roadmap
+### Características Técnicas
 
-#### Fase 1: Análise Léxica ✅
-- [x] Implementar tokenização básica
-- [x] Adicionar detecção de erros léxicos
-- [x] Criar sistema de recuperação de erros
-- [x] Implementar todos os tokens da linguagem
+#### Analisador Léxico
+- Tokenização caractere por caractere
+- Recuperação automática de erros
+- Rastreamento preciso de posição
+- 30+ tipos de tokens
 
-#### Fase 2: Análise Sintática 🚧
-- [ ] Definir gramática formal
-- [ ] Implementar parser recursivo descendente
-- [ ] Construir AST (Abstract Syntax Tree)
-- [ ] Adicionar recuperação de erros sintáticos
+#### Analisador Sintático
+- Parser recursivo descendente
+- Construção de AST completa
+- Detecção de erros sintáticos
+- Recuperação de erros
 
-#### Fase 3: Análise Semântica 📅
-- [ ] Implementar tabela de símbolos
-- [ ] Adicionar verificação de tipos
-- [ ] Validar declarações e escopo
-- [ ] Detectar uso de variáveis não declaradas
+#### Analisador Semântico
+- Tabela de símbolos hierárquica
+- Verificação de tipos
+- Análise de escopo (GLOBAL, BLOCO, LACO)
+- Detecção de variáveis não declaradas
 
-#### Fase 4: Interface Gráfica 📅
-- [ ] Criar GUI com Tkinter
-- [ ] Adicionar editor com syntax highlighting
-- [ ] Implementar visualização de tokens
-- [ ] Mostrar árvore sintática
+#### Interpretador
+- Execução linha por linha
+- Suporte a entrada interativa
+- Operações matemáticas e lógicas
+- Estruturas de controle completas
 
-### Como Contribuir
+## 📖 Exemplos de Uso
 
-1. **Fork** o projeto
-2. Crie uma **branch** para sua feature (`git checkout -b feature/NovaFuncionalidade`)
-3. **Commit** suas mudanças (`git commit -m 'feat: adiciona nova funcionalidade'`)
-4. **Push** para a branch (`git push origin feature/NovaFuncionalidade`)
-5. Abra um **Pull Request**
-
-### Padrões de Código
-
-- **Nomenclatura**: Snake_case para funções e variáveis
-- **Documentação**: Docstrings em português
-- **Commits**: Seguir [Conventional Commits](https://www.conventionalcommits.org/)
-- **Testes**: Adicionar casos de teste para novas funcionalidades
-
-## 📚 Documentação
-
-### Documentos Disponíveis
-
-- **[Requisitos Técnicos](docs/Requisitos%20Técnicos.md)** - Especificações detalhadas do projeto
-- **[Documentação Rainbow](docs/)** - PDFs com especificação da linguagem
-- **[CLAUDE.md](CLAUDE.md)** - Guia para desenvolvimento com Claude Code
-
-### Exemplos de Código
-
-<details>
-<summary>📝 Exemplo: Calculadora de Tabuada</summary>
+### Programa Interativo Completo
 
 ```rainbow
 RAINBOW.
 
-// Programa para calcular tabuada
-#numero recebe ler("Digite um número: ").
+// Programa de cadastro simples
+#nome recebe ler("Digite seu nome: ").
+#idade recebe ler("Digite sua idade: ").
+
+mostrar("").
+mostrar("=== DADOS CADASTRAIS ===").
+mostrar("Nome: " + #nome).
+mostrar("Idade: " + #idade).
+
+se (#idade >= 18) {
+    mostrar(#nome + " é maior de idade!").
+} senao {
+    mostrar(#nome + " é menor de idade.").
+}
+
+mostrar("Cadastro finalizado! 🌈").
+```
+
+### Calculadora de Tabuada
+
+```rainbow
+RAINBOW.
+
+#numero recebe 5.
+#i recebe 1.
+
 mostrar("Tabuada do " + #numero + ":").
 
-para #i de 1 ate 10 passo 1 {
+enquanto (#i <= 10) {
     #resultado recebe #numero * #i.
     mostrar(#numero + " x " + #i + " = " + #resultado).
+    #i recebe #i + 1.
 }
 ```
-</details>
 
-<details>
-<summary>🎮 Exemplo: Jogo de Adivinhação</summary>
+## 🚀 Como Usar
 
-```rainbow
-RAINBOW.
+1. **Abra a Rainbow IDE:**
+   ```bash
+   python3 main.py
+   ```
 
-#secreto recebe 42.
-#tentativa recebe 0.
-#acertou recebe Falso.
+2. **Escolha um exemplo** no menu "Exemplos" ou crie um novo arquivo
 
-enquanto (#acertou igual Falso) {
-    #tentativa recebe ler("Adivinhe o número: ").
-    
-    se (#tentativa igual #secreto) {
-        mostrar("Parabéns! Você acertou!").
-        #acertou recebe Verdadeiro.
-    } senaose (#tentativa > #secreto) {
-        mostrar("Muito alto! Tente novamente.").
-    } senao {
-        mostrar("Muito baixo! Tente novamente.").
-    }
-}
-```
-</details>
+3. **Execute o programa** com `Ctrl+R` ou clique em ▶️
+
+4. **Digite valores** quando solicitado nas caixas de diálogo
+
+5. **Veja a saída** no console integrado
 
 ## 🤝 Agradecimentos
 
-
+- **Professor Hudson** - Orientação e ensino de compiladores
+- **IFSULDEMINAS** - Infraestrutura e suporte acadêmico
 - **[Claude Code](https://claude.ai/code)** - IA assistente no desenvolvimento
 - **Comunidade Python** - Ferramentas e bibliotecas
 
 ## 📞 Contato
 
-Para dúvidas sobre o projeto, consulte a documentação ou entre em contato através das issues do GitHub.
-
-## 📈 Estatísticas do Projeto
-
-![GitHub last commit](https://img.shields.io/github/last-commit/username/compilers-rainbow_language?style=flat-square)
-![Lines of code](https://img.shields.io/tokei/lines/github/username/compilers-rainbow_language?style=flat-square)
-![GitHub repo size](https://img.shields.io/github/repo-size/username/compilers-rainbow_language?style=flat-square)
+Para dúvidas sobre o projeto educacional, entre em contato através das issues do GitHub ou com os desenvolvedores.
 
 ---
 
@@ -342,6 +335,6 @@ Para dúvidas sobre o projeto, consulte a documentação ou entre em contato atr
 
 **Desenvolvido com 💜 para aprendizado de compiladores**
 
-
+*Rainbow IDE - Onde o código ganha cores! 🌈*
 
 </div>
