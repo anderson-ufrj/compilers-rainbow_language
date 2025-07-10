@@ -214,6 +214,7 @@ compilers-rainbow_language/
 - **Threading** - Execução assíncrona
 - **JSON** - Saída estruturada
 - **RegEx** - Análise de padrões
+- **Claude Code** - IA utilizada para auxílio no desenvolvimento/documentação
 
 ### Características Técnicas
 
