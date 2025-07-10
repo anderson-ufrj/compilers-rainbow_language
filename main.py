@@ -117,17 +117,19 @@ class RainbowSplashScreen:
         center_x = self.width // 2
         center_y = self.height // 3 - 30
         
-        # Título Rainbow com cada letra em uma cor diferente
+        # Título Rainbow - todas as letras em preto exceto R em violeta
         title_text = "RAINBOW"
-        title_colors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3']
         
-        # Criar cada letra com cor diferente
+        # Criar cada letra
         self.title_letters = []
         letter_width = 35  # Largura aproximada de cada letra
         start_x = center_x - (len(title_text) * letter_width) // 2
         
-        for i, (letter, color) in enumerate(zip(title_text, title_colors)):
+        for i, letter in enumerate(title_text):
             x_pos = start_x + (i * letter_width)
+            # Primeira letra (R) em violeta, resto em preto
+            color = "#9400D3" if i == 0 else "#000000"
+            
             letter_obj = self.canvas.create_text(x_pos, center_y,
                                                text=letter,
                                                font=("Impact", 48, "bold"),
@@ -178,9 +180,17 @@ class RainbowSplashScreen:
             self.credits.append(credit)
     
     def create_loading_area(self):
-        """Cria área para mensagens de carregamento"""
+        """Cria área para mensagens de carregamento com faixa branca"""
         center_x = self.width // 2
         y = self.height - 120
+        
+        # Criar faixa branca no rodapé para melhor legibilidade
+        faixa_y1 = self.height - 150
+        faixa_y2 = self.height - 50
+        self.faixa_branca = self.canvas.create_rectangle(0, faixa_y1, self.width, faixa_y2,
+                                                        fill="#FFFFFF",
+                                                        outline="#FFFFFF",
+                                                        state='hidden')
         
         # Área de loading
         self.loading_text = self.canvas.create_text(center_x, y,
@@ -259,11 +269,13 @@ class RainbowSplashScreen:
     
     def animate_loading_start(self):
         """Inicia animação de loading"""
-        self.canvas.itemconfig(self.loading_text, state='normal')
-        # Não mostrar cursor piscante separado durante loading
+        # Mostrar faixa branca primeiro
+        self.canvas.itemconfig(self.faixa_branca, state='normal')
+        # Aguardar um pouco e mostrar texto
+        self.canvas.after(200, lambda: self.canvas.itemconfig(self.loading_text, state='normal'))
         
-        # Iniciar primeira mensagem
-        self.animate_next_message()
+        # Iniciar primeira mensagem após a faixa aparecer
+        self.canvas.after(400, self.animate_next_message)
     
     def animate_cursor(self):
         """Animação do cursor piscante (apenas quando necessário)"""
@@ -311,10 +323,11 @@ class RainbowSplashScreen:
         center_x = self.width // 2
         tip_y = self.height - 120
         
+        # Manter faixa branca visível para a dica
         tip = self.canvas.create_text(center_x, tip_y,
                                      text="💡 Clique na seção Ajuda para acessar a documentação do compilador.",
                                      font=("Segoe UI", 11, "italic"),
-                                     fill="#FFD700",
+                                     fill="#1976D2",
                                      state='normal')
         
         # Aguardar um pouco e fechar automaticamente
