@@ -918,7 +918,7 @@ class RainbowIDE:
     def show_about(self):
         about_window = tk.Toplevel(self.root)
         about_window.title("Sobre Rainbow IDE")
-        about_window.geometry("500x400")
+        about_window.geometry("550x600")
         about_window.configure(bg=self.bg_color)
         about_window.resizable(False, False)
         
@@ -926,56 +926,103 @@ class RainbowIDE:
         about_window.transient(self.root)
         about_window.grab_set()
         
+        # Centralizar na tela
+        x = (about_window.winfo_screenwidth() - 550) // 2
+        y = (about_window.winfo_screenheight() - 600) // 2
+        about_window.geometry(f"550x600+{x}+{y}")
+        
         # Criar gradiente arco-íris
-        gradient_frame = tk.Frame(about_window, height=50)
+        gradient_frame = tk.Frame(about_window, height=60)
         gradient_frame.pack(fill=tk.X)
+        gradient_frame.pack_propagate(False)
         
         for i, color in enumerate(self.rainbow_colors):
             label = tk.Label(gradient_frame, bg=color, width=10)
             label.place(relx=i/7, rely=0, relwidth=1/7, relheight=1)
             
-        # Informações
-        info_text = """🌈 Rainbow IDE
-Versão 1.0
-
-Ambiente de Desenvolvimento Integrado (IDE)
-para a linguagem de programação Rainbow
-
-📚 PROJETO ACADÊMICO
-Disciplina: Compiladores
-Instituição: IFSULDEMINAS Campus Muzambinho
-Professor: Hudson
-
-👨‍💻 DESENVOLVEDORES
-• Anderson Henrique da Silva
-• Lurian Letícia dos Reis
-
-⚡ CARACTERÍSTICAS
-• Editor com syntax highlighting
-• Análise léxica, sintática e semântica
-• Interpretador integrado
-• Visualização de tokens, AST e símbolos
-• Sistema de temas (claro/escuro)
-• Execução interativa de programas
-• Exemplos educacionais inclusos
-
-🛠️ TECNOLOGIAS
-• Python 3.10+
-• Tkinter (Interface Gráfica)
-• Compilador Rainbow personalizado
-        """
+        # Frame para scroll
+        main_frame = tk.Frame(about_window, bg=self.bg_color)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
         
-        info_label = tk.Label(about_window, text=info_text, 
-                             bg=self.bg_color, fg=self.text_fg,
-                             font=("Arial", 10), justify=tk.LEFT)
-        info_label.pack(pady=15, padx=20)
+        # Canvas e scrollbar para conteúdo
+        canvas = tk.Canvas(main_frame, bg=self.bg_color, highlightthickness=0)
+        scrollbar = tk.Scrollbar(main_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg=self.bg_color)
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Informações
+        info_sections = [
+            ("🌈 Rainbow IDE", "Arial", 18, "bold"),
+            ("Versão 1.0", "Arial", 12, "normal"),
+            ("", "Arial", 8, "normal"),  # Espaço
+            ("Ambiente de Desenvolvimento Integrado (IDE)", "Arial", 11, "normal"),
+            ("para a linguagem de programação Rainbow", "Arial", 11, "normal"),
+            ("", "Arial", 10, "normal"),  # Espaço
+            ("📚 PROJETO ACADÊMICO", "Arial", 12, "bold"),
+            ("Disciplina: Compiladores", "Arial", 10, "normal"),
+            ("Instituição: IFSULDEMINAS Campus Muzambinho", "Arial", 10, "normal"),
+            ("Professor: Hudson", "Arial", 10, "normal"),
+            ("", "Arial", 8, "normal"),  # Espaço
+            ("👨‍💻 DESENVOLVEDORES", "Arial", 12, "bold"),
+            ("• Anderson Henrique da Silva", "Arial", 10, "normal"),
+            ("• Lurian Letícia dos Reis", "Arial", 10, "normal"),
+            ("", "Arial", 8, "normal"),  # Espaço
+            ("⚡ CARACTERÍSTICAS", "Arial", 12, "bold"),
+            ("• Editor com syntax highlighting", "Arial", 10, "normal"),
+            ("• Análise léxica, sintática e semântica", "Arial", 10, "normal"),
+            ("• Interpretador integrado", "Arial", 10, "normal"),
+            ("• Visualização de tokens, AST e símbolos", "Arial", 10, "normal"),
+            ("• Sistema de temas (claro/escuro)", "Arial", 10, "normal"),
+            ("• Execução interativa de programas", "Arial", 10, "normal"),
+            ("• Exemplos educacionais inclusos", "Arial", 10, "normal"),
+            ("", "Arial", 8, "normal"),  # Espaço
+            ("🛠️ TECNOLOGIAS", "Arial", 12, "bold"),
+            ("• Python 3.10+", "Arial", 10, "normal"),
+            ("• Tkinter (Interface Gráfica)", "Arial", 10, "normal"),
+            ("• Compilador Rainbow personalizado", "Arial", 10, "normal"),
+        ]
+        
+        for text, font_family, font_size, font_weight in info_sections:
+            if text:  # Se não for espaço vazio
+                label = tk.Label(scrollable_frame, text=text, 
+                               bg=self.bg_color, fg=self.text_fg,
+                               font=(font_family, font_size, font_weight), 
+                               justify=tk.LEFT)
+                label.pack(anchor="w", pady=2)
+            else:  # Espaço vazio
+                spacer = tk.Label(scrollable_frame, text="", 
+                                bg=self.bg_color, 
+                                font=("Arial", font_size))
+                spacer.pack()
+        
+        # Empacotar canvas e scrollbar
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Frame para botão
+        button_frame = tk.Frame(about_window, bg=self.bg_color)
+        button_frame.pack(fill=tk.X, pady=10)
         
         # Botão fechar
-        close_btn = tk.Button(about_window, text="Fechar", 
+        close_btn = tk.Button(button_frame, text="Fechar", 
                              command=about_window.destroy,
                              bg=self.button_bg, fg=self.text_fg,
-                             font=("Arial", 12), padx=20, pady=5)
-        close_btn.pack(pady=10)
+                             font=("Arial", 12), padx=30, pady=8)
+        close_btn.pack()
+        
+        # Bind mouse wheel para scroll
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        
+        canvas.bind("<MouseWheel>", _on_mousewheel)
+        about_window.bind("<MouseWheel>", _on_mousewheel)
 
 def main():
     root = tk.Tk()
