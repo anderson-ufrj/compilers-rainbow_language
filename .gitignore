@@ -23,6 +23,11 @@ Thumbs.db
 # Project specific
 *.tokens
 *.errors
+*.syntax.errors
+*.ast
+*.stats
+*.analysis.json
+*.ast.json
 Scratches and Consoles/
 External Libraries/
 
