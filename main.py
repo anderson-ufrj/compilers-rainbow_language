@@ -40,23 +40,35 @@ class RainbowSplashScreen:
     def create_background_image(self):
         """Carrega e define imagem de fundo"""
         try:
-            # Caminho para a imagem
-            img_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
-                                  'assets', 'img', 'rainbow.jpg')
+            # Caminho direto para a imagem
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            img_path = os.path.join(current_dir, 'assets', 'img', 'rainbow.jpg')
+            
+            print(f"Tentando carregar imagem de: {img_path}")
             
             if os.path.exists(img_path):
-                # Carregar e redimensionar imagem
+                # Carregar imagem
                 pil_image = Image.open(img_path)
+                # Redimensionar mantendo proporção
                 pil_image = pil_image.resize((self.width, self.height), Image.Resampling.LANCZOS)
+                
+                # Converter para PhotoImage
                 self.bg_image = ImageTk.PhotoImage(pil_image)
                 
                 # Criar imagem de fundo no canvas
-                self.canvas.create_image(0, 0, anchor=tk.NW, image=self.bg_image)
+                # Usar tag para garantir que fique no fundo
+                self.canvas.create_image(0, 0, anchor=tk.NW, image=self.bg_image, tags="background")
+                # Garantir que a imagem fique no fundo
+                self.canvas.tag_lower("background")
+                print("Imagem de fundo carregada com sucesso!")
             else:
+                print(f"Imagem não encontrada em: {img_path}")
                 # Fallback para gradiente se imagem não existir
                 self.create_background_gradient()
         except Exception as e:
             print(f"Erro ao carregar imagem: {e}")
+            import traceback
+            traceback.print_exc()
             # Fallback para gradiente
             self.create_background_gradient()
     
