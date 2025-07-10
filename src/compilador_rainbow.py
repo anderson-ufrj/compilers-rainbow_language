@@ -7,9 +7,16 @@ Arquivo principal que combina análise léxica e sintática
 import sys
 import os
 from datetime import datetime
-from analisador_lexico import AnalisadorLexico, TokenType
-from analisador_sintatico import AnalisadorSintatico
-from analisador_semantico import AnalisadorSemantico
+try:
+    # Quando executado como módulo
+    from src.analisador_lexico import AnalisadorLexico, TokenType
+    from src.analisador_sintatico import AnalisadorSintatico
+    from src.analisador_semantico import AnalisadorSemantico
+except ImportError:
+    # Quando executado diretamente
+    from analisador_lexico import AnalisadorLexico, TokenType
+    from analisador_sintatico import AnalisadorSintatico
+    from analisador_semantico import AnalisadorSemantico
 
 
 class CompiladorRainbow:
@@ -390,6 +397,12 @@ def main():
         
         # Código de saída
         sys.exit(0 if sucesso else 1)
+
+
+def compilar_arquivo(caminho_arquivo: str) -> bool:
+    """Função helper para compilar um arquivo"""
+    compilador = CompiladorRainbow()
+    return compilador.compilar_arquivo(caminho_arquivo)
 
 
 if __name__ == "__main__":
