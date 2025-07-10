@@ -5,7 +5,7 @@
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python)
 ![Status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-Academic-green?style=for-the-badge)
-![AI](https://img.shields.io/badge/AI%20Powered-Claude%20Code-purple?style=for-the-badge)
+
 
 Um compilador educacional para a linguagem Rainbow, uma linguagem de programação em português projetada para fins didáticos.
 
