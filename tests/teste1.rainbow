@@ -1,0 +1,18 @@
+RAINBOW.
+
+// Programa de saudação simples
+#nome recebe ler("Digite seu nome: ").
+mostrar("Olá, " + #nome + "!").
+
+#idade recebe ler("Sua idade: ").
+se (#idade >= 18) {
+    mostrar("Você é maior de idade!").
+} senao {
+    mostrar("Você é menor de idade!").
+}
+
+// Tabuada
+para #i de 1 ate 5 passo 1 {
+    #resultado recebe 2 * #i.
+    mostrar("2 x " + #i + " = " + #resultado).
+}
