@@ -4,7 +4,7 @@ RAINBOW.
 #nome recebe ler("Digite seu nome: ").
 #idade recebe ler("Digite sua idade: ").
 
-mostrar("").
+mostrar("")
 mostrar("=== INFORMAÇÕES ===").
 mostrar("Nome: " + #nome).
 mostrar("Idade: " + #idade).

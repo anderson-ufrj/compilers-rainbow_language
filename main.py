@@ -405,7 +405,7 @@ class RainbowIDE:
         self.apply_theme(self.current_theme)
         
         # Configurações de UI moderna
-        self.corner_radius = 8
+        self.corner_radius = 10
         self.padding = 16
         self.spacing = 8
         
